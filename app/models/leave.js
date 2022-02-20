@@ -5,7 +5,7 @@ var leaveApplicationSchema = new mongoose.Schema({
     FromDate: { type: String, required: true },
     ToDate: { type: String, required: true },
     Reasonforleave: { type: String, required: true },
-    Status: { type: String, required: true },
+    status: { type: String, required: true },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'Employee'

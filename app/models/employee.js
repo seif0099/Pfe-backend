@@ -2,19 +2,23 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 
 var employeeSchema = new mongoose.Schema({
-    username: { type: String, required: true },
-    nom: { type: String, required: false },
+    username: { type: String },
+    nom: { type: String },
 
-    prenom: { type: String, required: false },
-    email: { type: String, required: true, unique: true },
-    password: { type: String, required: true },
+    prenom: { type: String },
+    email: { type: String, unique: true },
+    password: { type: String },
 
-    classEmp: { type: String, required: false },
-    matricule: { type: String, required: false },
+    classEmp: { type: String },
+    matricule: { type: String },
 
     leaveApplication: [
         { type: Schema.Types.ObjectId, ref: "LeaveApplication" }
     ],
+    sanction: [
+
+        { type: Schema.Types.ObjectId, ref: "sanction" }
+    ]
 
 });
 var Employee = mongoose.model('Employee', employeeSchema);

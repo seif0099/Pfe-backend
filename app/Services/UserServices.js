@@ -1,7 +1,10 @@
 var User = require("../models/employee");
 var LeaveApplication = require("../models/leave");
+var admin = require("../models/admin");
 var jwt = require("jsonwebtoken");
 var sha512 = require("js-sha512");
+var ObjectId = require('mongoose').mongo.ObjectID;
+
 /* costum methods  */
 
 var Encrypt = function(string) {
@@ -52,10 +55,10 @@ module.exports = {
             username: req.body.username,
             email: req.body.email,
             password: Encrypt(req.body.password),
-            nom: "",
-            prenom: "",
-            classEmp: "",
-            matricule: ""
+            nom: req.body.nom,
+            prenom: req.body.prenom,
+            classEmp: req.body.classEmp,
+            matricule: req.body.matricule
         });
 
         newUser.save(function(err, data) {
@@ -84,6 +87,12 @@ module.exports = {
         });
     },
 
+    logout: function(req, res) {
+        req.session.destroy(() => {
+            req.logout();
+            res.redirect("/"); //Inside a callback… bulletproof!
+        });
+    },
 
     updateProfilePic: async(req, res) => {
         upload(req, res, function(err) {
@@ -102,51 +111,26 @@ module.exports = {
     },
 
 
-    requestLeave: async(req, res) => {
+    deleteUser: async(req, res) => {
 
         try {
-            const newLeave = new LeaveApplication(req.body);
-            const user = await User.findById(req.params.id);
-            newLeave.user = user;
-            await newLeave.save();
-            user.leaveApplication.push(newLeave);
-            await user.save();
-            let leaves = await LeaveApplication.find({}).populate('Employee');
+            console.log("object...................")
+            const result = await User.findOneAndDelete({ '_id': req.params.id });
 
-            res.send(leaves)
+            return res.status(200).send()
+
+
 
         } catch (error) {
-            console.log(error);
-            res.send("err");
+
+            res.status(500).send({ error })
         }
-    },
 
-    deleteLeave: async(req, res) => {
-        User.findById({ id: req.params.id }, function(err, employee) {
-            if (err) {
-                res.send("error");
-                console.log(err.message);
-            } else {
-                LeaveApplication.findByIdAndRemove({ id: req.params.id }, function(
-                    err,
-                    leaveApplication
-                ) {
-                    if (!err) {
-                        console.log("LeaveApplication deleted");
-                        User.updateOne({ id: req.params.id }, { $pull: { leaveApplication: req.params.id2 } }),
-
-                            res.send(leaveApplication);
-
-
-                    } else {
-                        console.log(err.message);
-                        res.send("error");
-                    }
-                });
-                console.log("delete");
-                console.log(req.params.id);
-            }
-        });
     }
+
+
+
+
+
 
 }
