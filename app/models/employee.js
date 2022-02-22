@@ -1,4 +1,5 @@
-var mongoose = require('mongoose')
+var mongoose = require('mongoose');
+const promotion = require('./promotion');
 var Schema = mongoose.Schema;
 
 var employeeSchema = new mongoose.Schema({
@@ -18,7 +19,16 @@ var employeeSchema = new mongoose.Schema({
     sanction: [
 
         { type: Schema.Types.ObjectId, ref: "sanction" }
+    ],
+    promotion: [
+
+        { type: Schema.Types.ObjectId, ref: "promotion" }
+    ],
+    mission: [
+
+        { type: Schema.Types.ObjectId, ref: "mission" }
     ]
+
 
 });
 var Employee = mongoose.model('Employee', employeeSchema);

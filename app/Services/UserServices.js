@@ -70,22 +70,14 @@ module.exports = {
         });
     },
 
-    GetAllUsers: async(req, res) => {
-        User.find({}, function(err, users) {
-            res.json(users);
-        });
-    },
+
     UpdateUser: async(req, res) => {
         await User.findByIdAndUpdate(req.params.userid, req.body);
 
         res.status(200).json({ success: true });
     },
 
-    GetUserById: async(req, res) => {
-        User.find({ _id: req.params.userid }, (err, user) => {
-            res.json(user[0]);
-        });
-    },
+
 
     logout: function(req, res) {
         req.session.destroy(() => {
