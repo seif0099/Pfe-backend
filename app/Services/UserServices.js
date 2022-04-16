@@ -3,6 +3,8 @@ var LeaveApplication = require("../models/leave");
 var admin = require("../models/admin");
 var jwt = require("jsonwebtoken");
 var sha512 = require("js-sha512");
+const SuppHours = require("../models/suppHours");
+const mission = require("../models/mission");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -15,12 +17,12 @@ var Encrypt = function(string) {
 };
 module.exports = {
     Authenticate: async(req, res) => {
-        let user = await User.findOne({ username: req.body.username });
-
+        let user = await User.findOne({ email: req.body.email });
+           
         if (!user) {
             res.json({
                 success: false,
-                message: "Authentication failed. User not found.",
+                message: "Authentication failed. email not found.",
             });
         } else {
             if (Encrypt(req.body.password) != user.password) {
@@ -58,7 +60,8 @@ module.exports = {
             nom: req.body.nom,
             prenom: req.body.prenom,
             classEmp: req.body.classEmp,
-            matricule: req.body.matricule
+            matricule: req.body.matricule,
+            postEmp : req.body.postEmp 
         });
 
         newUser.save(function(err, data) {
@@ -118,8 +121,84 @@ module.exports = {
             res.status(500).send({ error })
         }
 
-    }
+    },
+    requestSuppHours: async(req, res) => {
 
+        try {
+            const newReq = new SuppHours(req.body);
+            console.log(req.body);
+            const user = await User.findById(req.body.userid);
+            console.log(user)
+            newReq.user = user;
+            await newReq.save();
+            user.SuppHours.push(newReq);
+            await user.save();
+            let hours = await SuppHours.find({}).populate('Employee');
+
+            res.send(hours)
+        } catch (error) {
+            console.log(error);
+            res.send("err");
+        }
+    },
+
+    deleteReqHours: async(req, res) => {
+
+        try {
+            const result = await SuppHours.findOneAndDelete({ '_id': req.params.id });
+            if (result) {
+                const userUpdated = await User.updateOne({ '_id': result.user }, {
+                    $pull: {
+                        SuppHours: ObjectId(req.params.id)
+                    }
+                })
+                return res.status(200).send()
+            }
+
+
+        } catch (error) {
+
+            res.status(500).send({ error })
+        }
+
+    },
+
+
+
+
+    /* updateLeave: async(req, res) => {
+         try {
+             const updatedLeaveData = new LeaveApplication(req.body)
+             console.log("--------------", updatedLeaveData)
+
+             await LeaveApplication.findOneAndUpdate(req.params.id, {
+                     $set: {
+                         Leavetype: req.body.Leavetype,
+                         FromDate: req.body.FromDate,
+                         ToDate: req.body.ToDate,
+                         Reasonforleave: req.body.Reasonforleave,
+                         Status: req.body.Status,
+                         userid: req.body.userid
+                     }
+                 },
+
+             ).then((LeaveApplication));
+
+             res.status(200).json({ success: true });
+         } catch (error) {
+
+             res.status(500).send({ error })
+         }
+
+     }*/
+
+    updateReqHours: async(req, res) => {
+        await SuppHours.findByIdAndUpdate(req.params.id, req.body);
+
+        res.status(200).json({ success: true });
+    },
+
+  
 
 
 

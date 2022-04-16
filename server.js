@@ -42,7 +42,7 @@ app.use('/api', apiRoutes);
 //api routes 
 routes(app, apiRoutes);
 // listening to http://127.0.0.1:3000
-app.set('port', (process.env.PORT || 3000));
+app.set('port', (process.env.PORT || 9000));
 app.listen(app.get('port'), () => {
     console.log('Node app is running on port', app.get('port'));
 
