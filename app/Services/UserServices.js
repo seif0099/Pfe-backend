@@ -5,6 +5,7 @@ var jwt = require("jsonwebtoken");
 var sha512 = require("js-sha512");
 const SuppHours = require("../models/suppHours");
 const mission = require("../models/mission");
+const Rapport = require("../models/rapport");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -75,9 +76,12 @@ module.exports = {
 
 
     UpdateUser: async(req, res) => {
-        await User.findByIdAndUpdate(req.params.userid, req.body);
-
+        console.log(req.body.userid)
+        Object.keys(req.body).forEach((k) => req.body[k] == '' && delete req.body[k]);
+       await User.findByIdAndUpdate(req.body.userid, req.body);
+        
         res.status(200).json({ success: true });
+        console.log(req.body)
     },
 
 
@@ -200,6 +204,25 @@ module.exports = {
 
   
 
+    requestRapport: async(req, res) => {
+
+        try {
+            const newRapp = new Rapport(req.body);
+            console.log(req.body);
+            const user = await User.findById(req.body.userid);
+            console.log(user)
+            newRapp.user = user;
+            await newRapp.save();
+            user.Rapport.push(newRapp);
+            await user.save();
+            let rapp = await Rapport.find({}).populate('Employee');
+
+            res.send(rapp)
+        } catch (error) {
+            console.log(error);
+            res.send("err");
+        }
+    },
 
 
 

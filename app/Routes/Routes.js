@@ -16,7 +16,9 @@ module.exports = (app, apiRoutes) => {
   app.route("/userdeleted/:id").delete(UserServices.deleteUser);
   app.route("/logout").get(UserServices.logout);
   app.route("/requestSuppHours").post(Uservice.requestSuppHours);
+  app.route("/userupdated").post(UserServices.UpdateUser);
 
+  app.route("/requestrapport").post(Uservice.requestRapport);
 
   app.route("/leaveupdated/:id").put(leaveServices.updateLeave);
   app.route("/deleteleave/:id").delete(leaveServices.deleteLeave);
