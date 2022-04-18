@@ -19,6 +19,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/userupdated").post(UserServices.UpdateUser);
 
   app.route("/requestrapport").post(Uservice.requestRapport);
+  app.route("/getpointage").get(UserServices.getPointage)
 
   app.route("/leaveupdated/:id").put(leaveServices.updateLeave);
   app.route("/deleteleave/:id").delete(leaveServices.deleteLeave);
