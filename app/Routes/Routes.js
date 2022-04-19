@@ -43,5 +43,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/updateMutualPaper/:id").put(adminService.updateMission);
   app.route("/deletesMutualPaper/:id").delete(adminService.deleteMission);
 
+  app.route("/adminPointage").post(adminService.InsertPointage);
+
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);
 };

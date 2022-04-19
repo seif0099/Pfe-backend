@@ -8,6 +8,7 @@ var sanction = require("../models/sanctions");
 const promotion = require("../models/promotion");
 const mission = require("../models/mission");
 const mutual = require("../models/mutualPaper");
+const AdminPointage = require("../models/adminPointage");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -79,6 +80,7 @@ module.exports = {
   GetAllUsers: async (req, res) => {
     User.find({}, function (err, users) {
       res.json(users);
+      console.log(users)
     });
   },
   GetUserById: async (req, res) => {
@@ -102,7 +104,7 @@ module.exports = {
       await newProm.save();
       user.promotion.push(newProm);
       await user.save();
-      let proms = await promotion.find({}).populate("promotion");
+      let proms = await promotion.find({}).populate("Employee");
 
       res.send(proms);
     } catch (error) {
@@ -121,7 +123,7 @@ module.exports = {
       await newMission.save();
       user.mission.push(newMission);
       await user.save();
-      let missions = await mission.find({}).populate("mission");
+      let missions = await mission.find({}).populate("Employee");
 
       res.send(missions);
     } catch (error) {
@@ -163,7 +165,7 @@ module.exports = {
       await newPaper.save();
       user.mutual.push(newPaper);
       await user.save();
-      let papers = await mutual.find({}).populate("mutual");
+      let papers = await mutual.find({}).populate("Employee");
 
       res.send(papers);
     } catch (error) {
@@ -195,4 +197,29 @@ module.exports = {
       res.status(500).send({ error });
     }
   },
-};
+  InsertPointage: async(req,res) =>{
+    try {
+      const newPointage = new AdminPointage(req.body);
+      console.log(req.body);
+      const user = await User.findById(req.body.userid);
+      console.log(user);
+      newPointage.user = user;
+      await newPointage.save();
+      user.AdminPointage.push(newPointage);
+      await user.save();
+      let p = await AdminPointage.find({}).populate("Employee");
+
+      res.send(p);
+    } catch (error) {
+      console.log(error);
+      res.send("err");
+    }
+  },
+  updateAdminPointage: async (req, res) => {
+    await AdminPointage.findByIdAndUpdate(req.body.id, req.body);
+
+    res.status(200).json({ success: true });
+  },
+
+  }
+

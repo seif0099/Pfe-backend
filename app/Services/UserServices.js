@@ -224,6 +224,11 @@ module.exports = {
         }
     },
 
+    getPointage: async(req,res) => {
+
+
+        
+    }
 
 
 
