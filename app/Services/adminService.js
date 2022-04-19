@@ -8,7 +8,7 @@ var sanction = require("../models/sanctions");
 const promotion = require("../models/promotion");
 const mission = require("../models/mission");
 const mutual = require("../models/mutualPaper");
-const AdminPointage = require("../models/adminPointage");
+const Pointage = require("../models/pointage");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -199,24 +199,25 @@ module.exports = {
   },
   InsertPointage: async(req,res) =>{
     try {
-      const newPointage = new AdminPointage(req.body);
+      console.log("insertion")
+      const newPointage = new Pointage(req.body);
       console.log(req.body);
       const user = await User.findById(req.body.userid);
       console.log(user);
       newPointage.user = user;
       await newPointage.save();
-      user.AdminPointage.push(newPointage);
+      user.Pointage.push(newPointage);
       await user.save();
-      let p = await AdminPointage.find({}).populate("Employee");
-
+      let p = await Pointage.find({}).populate("Employee");
+      console.log("mriguel")
       res.send(p);
     } catch (error) {
       console.log(error);
       res.send("err");
     }
   },
-  updateAdminPointage: async (req, res) => {
-    await AdminPointage.findByIdAndUpdate(req.body.id, req.body);
+  updatePointage: async (req, res) => {
+    await Pointage.findByIdAndUpdate(req.body.id, req.body);
 
     res.status(200).json({ success: true });
   },

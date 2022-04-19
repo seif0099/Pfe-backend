@@ -6,6 +6,7 @@ var sha512 = require("js-sha512");
 const SuppHours = require("../models/suppHours");
 const mission = require("../models/mission");
 const Rapport = require("../models/rapport");
+const Pointage = require("../models/pointage");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -225,9 +226,20 @@ module.exports = {
     },
 
     getPointage: async(req,res) => {
-
-
-        
+        const date = Date.parse(req.query.pDate);
+        const userId = req.query.userId;
+        const myUser = await User.findById(userId);
+        console.log(userId)
+        const pointages = await Pointage.find({'user': myUser})
+        /*
+        const pointages = await Pointage.aggregate(
+            [{
+                $project: {
+                    month: {$month: "$pDate"}
+                }
+            }]
+        )*/
+        console.log(pointages);
     }
 
 
