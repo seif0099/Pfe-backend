@@ -226,20 +226,24 @@ module.exports = {
     },
 
     getPointage: async(req,res) => {
-        const date = Date.parse(req.query.pDate);
+        const mDate = new Date(req.query.pDate)
         const userId = req.query.userId;
         const myUser = await User.findById(userId);
         console.log(userId)
-        const pointages = await Pointage.find({'user': myUser})
-        /*
+        /*const pointages = await Pointage.find({'user': myUser})*/
+        
         const pointages = await Pointage.aggregate(
             [{
-                $project: {
-                    month: {$month: "$pDate"}
-                }
+                $addFields: {  
+                    "month" : {$month: '$pDate'},
+                    "year" : {$year: '$pDate'}
+                },
+                
             }]
-        )*/
-        console.log(pointages);
+        )
+        console.log(mDate.getMonth());
+        const p = pointages.filter(a => (a.month == mDate.getMonth() && a.user == userId && a.year == mDate.getFullYear()));
+        console.log(p);
     }
 
 
