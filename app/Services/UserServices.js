@@ -236,14 +236,17 @@ module.exports = {
             [{
                 $addFields: {  
                     "month" : {$month: '$pDate'},
-                    "year" : {$year: '$pDate'}
+                    "year" : {$year: '$pDate'},
+                    "day": {$dayOfMonth: '$pDate'}
                 },
                 
             }]
         )
+        mDate.setMonth(mDate.getMonth()+1);
         console.log(mDate.getMonth());
+
         const p = pointages.filter(a => (a.month == mDate.getMonth() && a.user == userId && a.year == mDate.getFullYear()));
-        console.log(p);
+        res.status(200).send(p);
     }
 
 
