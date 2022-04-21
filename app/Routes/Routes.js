@@ -44,6 +44,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/deletesMutualPaper/:id").delete(adminService.deleteMission);
 
   app.route("/adminPointage").post(adminService.InsertPointage);
+  app.route("/admin-signin").post(adminService.Authenticate);
 
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);
 };

@@ -17,6 +17,40 @@ var Encrypt = function (string) {
   return encrypted;
 };
 module.exports = {
+  Authenticate: async(req, res) => {
+    let user = await admin.findOne({ email: req.body.email });
+       
+    if (!user) {
+        res.json({
+            success: false,
+            message: "Authentication failed. email not found.",
+        });
+    } else {
+        if (Encrypt(req.body.password) != user.password) {
+            res.json({
+                success: false,
+                message: "Authentication failed. Wrong password.",
+            });
+        } else {
+            const payload = {
+                admin: user.admin,
+            };
+
+            var token = jwt.sign(payload, 'kjhkhkjh', {
+                expiresIn: "2 days",
+            });
+
+            // return the information including token as JSON
+            res.json({
+                success: true,
+                message: "Enjoy your token!",
+                idToken: token,
+                expiresIn: 1440,
+                user: user,
+            });
+        }
+    }
+},
   deleteUser: async (req, res) => {
     try {
       console.log("object...................");
