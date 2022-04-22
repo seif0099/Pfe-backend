@@ -32,8 +32,8 @@ module.exports = (app, apiRoutes) => {
   app.route("/deletesanction/:id").delete(adminService.deleteSanction);
   app.route("/updatesanction/:id").put(adminService.updateSanction);
   app.route("/getsanction/:id").get(adminService.GetAllSanctions);
-  app.route("/createprom/").post(adminService.createPromotion);
-  app.route("/updateprom/:id").put(adminService.updatePromotion);
+  app.route("/createprom").post(adminService.createPromotion);
+  app.route("/updateprom").put(adminService.updatePromotion);
 
   app.route("/createmission").post(adminService.createMission);
   app.route("/updatemission/:id").put(adminService.updateMission);

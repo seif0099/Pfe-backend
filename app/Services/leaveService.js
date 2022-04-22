@@ -86,7 +86,7 @@ module.exports = {
 
      }*/
 
-    updateLeaveRefused: async(req, res) => {
+    updateLeave: async(req, res) => {
         await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
 
         res.status(200).json({ success: true });
