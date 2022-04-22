@@ -45,10 +45,14 @@ module.exports = (app, apiRoutes) => {
 
   app.route("/adminPointage").post(adminService.InsertPointage);
   app.route("/admin-signin").post(adminService.Authenticate);
+
   app.route("/adminRequests").get(adminService.GetAllRequests);
   app.route("/adminRequestsRefuse").put(adminService.updateLeaveRefused);
   app.route("/adminRequestsAccept").put(adminService.updateLeaveAccepted);
 
+  app.route("/adminSuppHours").get(adminService.getAllHours);
+  app.route("/adminSuppHoursRefuse").put(adminService.updateHoursRefused);
+  app.route("/adminSuppHoursAccept").put(adminService.updateHoursAccepted);
 
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);
 };
