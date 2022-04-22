@@ -256,8 +256,8 @@ module.exports = {
     res.status(200).json({ success: true });
   },
   GetAllRequests: async (req, res) => {
-    LeaveApplication.find({status : "pending"}, function (err, users) {
-      res.json(users);
+    await LeaveApplication.find({status : "pending"}, function (err, users) {
+      res.status(200).json(users);
       console.log(users)
     });
   },
