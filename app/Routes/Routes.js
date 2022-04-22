@@ -46,6 +46,9 @@ module.exports = (app, apiRoutes) => {
   app.route("/adminPointage").post(adminService.InsertPointage);
   app.route("/admin-signin").post(adminService.Authenticate);
   app.route("/adminRequests").get(adminService.GetAllRequests);
+  app.route("/adminRequestsRefuse").put(adminService.updateLeaveRefused);
+  app.route("/adminRequestsAccept").put(adminService.updateLeaveAccepted);
+
 
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);
 };

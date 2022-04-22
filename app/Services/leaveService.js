@@ -38,11 +38,12 @@ module.exports = {
     deleteLeave: async(req, res) => {
 
         try {
-            const result = await LeaveApplication.findOneAndDelete({ '_id': req.params.id });
+            const result = await LeaveApplication.findOneAndDelete({ '_id': req.query.id });
             if (result) {
                 const userUpdated = await User.updateOne({ '_id': result.user }, {
                     $pull: {
-                        leaveApplication: ObjectId(req.params.id)
+                        leaveApplication: ObjectId(req.query.id),
+                        status : "Refused"
                     }
                 })
                 return res.status(200).send()
@@ -85,8 +86,8 @@ module.exports = {
 
      }*/
 
-    updateLeave: async(req, res) => {
-        await LeaveApplication.findByIdAndUpdate(req.params.id, req.body);
+    updateLeaveRefused: async(req, res) => {
+        await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
 
         res.status(200).json({ success: true });
     },

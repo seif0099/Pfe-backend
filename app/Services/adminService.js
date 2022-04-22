@@ -261,6 +261,16 @@ module.exports = {
       console.log(users)
     });
   },
+  updateLeaveRefused: async(req, res) => {
+    await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
+
+    res.status(200).json({ success: true });
+},
+updateLeaveAccepted: async(req, res) => {
+  await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Accepted"});
+
+  res.status(200).json({ success: true });
+},
 
   }
 
