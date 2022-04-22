@@ -135,6 +135,7 @@ module.exports = {
             const user = await User.findById(req.body.userid);
             console.log(user)
             newReq.user = user;
+            newReq.status = "pending"
             await newReq.save();
             user.SuppHours.push(newReq);
             await user.save();

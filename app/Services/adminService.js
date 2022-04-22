@@ -9,6 +9,7 @@ const promotion = require("../models/promotion");
 const mission = require("../models/mission");
 const mutual = require("../models/mutualPaper");
 const Pointage = require("../models/pointage");
+const SuppHours = require("../models/suppHours");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -256,8 +257,8 @@ module.exports = {
     res.status(200).json({ success: true });
   },
   GetAllRequests: async (req, res) => {
-    LeaveApplication.find({status : "pending"}, function (err, users) {
-      res.json(users);
+    await LeaveApplication.find({status : "pending"}, function (err, users) {
+      res.status(200).json(users);
       console.log(users)
     });
   },
@@ -271,6 +272,21 @@ updateLeaveAccepted: async(req, res) => {
 
   res.status(200).json({ success: true });
 },
+getAllHours: async (req, res) => {
+  await SuppHours.find({status : "pending"}, function (err, users) {
+    res.status(200).json(users);
+    console.log(users)
+  });
+},
+updateHoursRefused: async(req, res) => {
+  await SuppHours.findByIdAndUpdate(req.query.id, {status : "Refused"});
 
+  res.status(200).json({ success: true });
+},
+updateHoursAccepted: async(req, res) => {
+await SuppHours.findByIdAndUpdate(req.query.id, {status : "Accepted"});
+
+res.status(200).json({ success: true });
+},
   }
 
