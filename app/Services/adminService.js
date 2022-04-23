@@ -135,6 +135,7 @@ module.exports = {
       newProm.user = user;
       await newProm.save();
       user.promotion.push(newProm);
+      user.postEmp = req.body.newPoste
       await user.save();
       let proms = await promotion.find({}).populate("Employee");
 
