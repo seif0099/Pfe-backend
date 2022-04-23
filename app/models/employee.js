@@ -22,6 +22,7 @@ var employeeSchema = new mongoose.Schema({
   SuppHours: [{ type: Schema.Types.ObjectId, ref: "SuppHours" }],
   pointage: [{ type: Schema.Types.ObjectId, ref: "pointage" }],
   rapport: [{ type: Schema.Types.ObjectId, ref: "rapport" }],
+  Mutation: [{ type: Schema.Types.ObjectId, ref: "Mutation" }],
 
 });
 var Employee = mongoose.model("Employee", employeeSchema);

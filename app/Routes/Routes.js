@@ -52,6 +52,8 @@ module.exports = (app, apiRoutes) => {
   app.route("/adminSuppHours").get(adminService.getAllHours);
   app.route("/adminSuppHoursRefuse").put(adminService.updateHoursRefused);
   app.route("/adminSuppHoursAccept").put(adminService.updateHoursAccepted);
+  app.route("/adminMutation").post(adminService.createMutation);
+
 
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);
 };

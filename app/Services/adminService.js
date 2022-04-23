@@ -10,6 +10,7 @@ const mission = require("../models/mission");
 const mutual = require("../models/mutualPaper");
 const Pointage = require("../models/pointage");
 const SuppHours = require("../models/suppHours");
+const Mutation = require("../models/mutation");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -283,6 +284,27 @@ updateHoursAccepted: async(req, res) => {
 await SuppHours.findByIdAndUpdate(req.query.id, {status : "Accepted"});
 
 res.status(200).json({ success: true });
+},
+
+
+
+createMutation: async (req, res) => {
+  try {
+    const newMut = new Mutation(req.body);
+    console.log(req.body);
+    const user = await User.findById(req.body.userid);
+    console.log(user);
+    newMut.user = user;
+    await newMut.save();
+    user.Mutation.push(newMut);
+    await user.save();
+    let papers = await Mutation.find({}).populate("Employee");
+
+    res.send(papers);
+  } catch (error) {
+    console.log(error);
+    res.send("err");
+  }
 },
   }
 
