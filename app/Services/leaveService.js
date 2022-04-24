@@ -92,9 +92,9 @@ module.exports = {
         res.status(200).json({ success: true });
     },
     GetRequestById: async (req, res) => {
-        console.log(req.query._id)
-        LeaveApplication.find({ _id: req.query._id }, (err, user) => {
-          res.json(user[0]);
-        });
+        console.log(req.query.id)
+        const user = await User.findById(req.query.id);
+        const result = await LeaveApplication.find({user: user})
+        res.status(200).send(result);
       },
 }
