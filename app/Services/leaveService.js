@@ -105,6 +105,7 @@ module.exports = {
                 newRow.nom = user.nom
                 newRow.prenom = user.prenom
                 newRow.status = row.status
+                newRow.reasonForLeave = row.reasonForLeave
                 result.push(newRow)
             }
         )
