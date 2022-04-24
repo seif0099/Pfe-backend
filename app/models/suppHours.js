@@ -1,8 +1,6 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var SuppHoursSchema = new mongoose.Schema({
-  nom: { type: String, required: true },
-  prenom: { type: String, required: true },
   fromDate: { type: Date, required: true },
   toDate: { type: Date, required: true },
   typeOfWork: { type: String,  required: true},
