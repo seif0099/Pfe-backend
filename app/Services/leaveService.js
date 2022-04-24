@@ -91,4 +91,10 @@ module.exports = {
 
         res.status(200).json({ success: true });
     },
+    GetRequestById: async (req, res) => {
+        console.log(req.query._id)
+        LeaveApplication.find({ _id: req.query._id }, (err, user) => {
+          res.json(user[0]);
+        });
+      },
 }
