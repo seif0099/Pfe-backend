@@ -94,7 +94,20 @@ module.exports = {
     GetRequestById: async (req, res) => {
         console.log(req.query.id)
         const user = await User.findById(req.query.id);
-        const result = await LeaveApplication.find({user: user})
+        const leaves = await LeaveApplication.find({user: user})
+        const result = []
+        leaves.map(
+            row => {
+                let newRow = {}
+                newRow._id = row._id
+                newRow.fromDate = row.fromDate
+                newRow.toDate = row.toDate
+                newRow.nom = user.nom
+                newRow.prenom = user.prenom
+                newRow.status = row.status
+                result.push(newRow)
+            }
+        )
         res.status(200).send(result);
       },
 }
