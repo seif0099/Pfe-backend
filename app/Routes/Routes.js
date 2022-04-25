@@ -26,6 +26,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/requestleave").post(leaveServices.requestLeave);
   app.route("/getrequest").get(leaveServices.GetRequestById);
 
+
   app.route("/users").get(adminService.GetAllUsers);
   app.route("/users/:userid").get(adminService.GetUserById);
   app.route("/adminDeleteUser/:id").delete(adminService.deleteUser);

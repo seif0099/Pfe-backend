@@ -87,9 +87,10 @@ module.exports = {
      }*/
 
     updateLeave: async(req, res) => {
-        await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
-
+        result = await LeaveApplication.findByIdAndUpdate(req.query.id,req.body );
+console.log(req.body)
         res.status(200).json({ success: true });
+        console.log("kharya",result)
     },
     GetRequestById: async (req, res) => {
         console.log(req.query.id)
@@ -111,4 +112,5 @@ module.exports = {
         )
         res.status(200).send(result);
       },
+     
 }
