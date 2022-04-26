@@ -3,16 +3,21 @@ const promotion = require("./promotion");
 var Schema = mongoose.Schema;
 
 var employeeSchema = new mongoose.Schema({
-  username: { type: String },
-  nom: { type: String },
+  username: { type: String ,required : true},
+  nom: { type: String,required : true },
 
-  prenom: { type: String },
+  prenom: { type: String ,required : true},
   email: { type: String, unique: true },
-  password: { type: String },
-  postEmp: { type: String },
+  password: { type: String ,required : true},
+  poste: { type: String ,required : true},
 
-  classEmp: { type: String },
-  matricule: { type: String },
+  matricule: { type: String ,required : true},
+  service:{type : String ,required : true},
+  tel:{type : String ,required : true},
+  sitFam:{type : String ,required : true},
+  adresse:{type : String ,required : true},
+  dateEmb:{type : Date ,required : true},
+
 
   leaveApplication: [{ type: Schema.Types.ObjectId, ref: "LeaveApplication" }],
   sanction: [{ type: Schema.Types.ObjectId, ref: "sanction" }],

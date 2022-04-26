@@ -53,26 +53,28 @@ module.exports = {
         }
     },
 
-    SignIn: (req, res) => {
-        console.log({ x: req.body })
-        var newUser = new User({
-            username: req.body.username,
-            email: req.body.email,
-            password: Encrypt(req.body.password),
-            nom: req.body.nom,
-            prenom: req.body.prenom,
-            classEmp: req.body.classEmp,
-            matricule: req.body.matricule,
-            postEmp : req.body.postEmp 
-        });
-
-        newUser.save(function(err, data) {
-            if (err) {
-                console.log(err);
-            } else {
-                res.json({ data });
+    SignIn: async (req, res) => {
+        try {
+            let account = await User.findOne({email: req.body.email})
+            if(account){
+                throw conflictError
             }
-        });
+            let data = req.body
+            data.password= Encrypt(req.body.password)
+            var newUser = new User(data);
+
+            newUser.save(function(err, data) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.json({ data });
+                }
+            });
+            res.status(200).json({success: true})
+        }
+        catch(conflictError) {
+            res.status(409).json({error: "Ce compte existe déja"})
+        }
     },
 
 
