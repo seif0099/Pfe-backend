@@ -135,11 +135,11 @@ module.exports = {
       newProm.user = user;
       await newProm.save();
       user.promotion.push(newProm);
-      user.postEmp = req.body.newPoste
+      user.poste = req.body.newPoste
       await user.save();
       let proms = await promotion.find({}).populate("Employee");
 
-      res.send(proms);
+      res.status(200).json({message: "Promotion crée avec succés"})
     } catch (error) {
       console.log(error);
       res.send("err");
@@ -255,10 +255,19 @@ module.exports = {
     res.status(200).json({ success: true });
   },
   GetAllRequests: async (req, res) => {
-    await LeaveApplication.find({status : "pending"}, function (err, users) {
-      res.status(200).json(users);
-      console.log(users)
-    });
+    let result = []
+    let requests = await LeaveApplication.find({status : "pending"}).populate("user");
+    requests.map(row => {
+      let newElement = {}
+      newElement._id = row._id
+      newElement.fromDate = row.fromDate
+      newElement.toDate = row.toDate
+      newElement.reasonForLeave = row.reasonForLeave
+      newElement.nom = row.user.nom
+      newElement.prenom = row.user.prenom
+      result.push(newElement)
+    })
+    res.status(200).json(result)
   },
   updateLeaveRefused: async(req, res) => {
     await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
@@ -271,10 +280,20 @@ updateLeaveAccepted: async(req, res) => {
   res.status(200).json({ success: true });
 },
 getAllHours: async (req, res) => {
-  await SuppHours.find({status : "pending"}, function (err, users) {
-    res.status(200).json(users);
-    console.log(users)
-  });
+  let result = []
+  let suppHours = await SuppHours.find({status : "pending"}).populate("user");
+  suppHours.map(row => {
+    let newElement = {}
+    newElement._id = row._id
+    newElement.typeOfWork = row.typeOfWork
+    newElement.fromDate = row.fromDate
+    newElement.toDate = row.toDate
+    newElement.nom = row.user.nom
+    newElement.prenom = row.user.prenom
+    result.push(newElement)
+  })
+  res.status(200).json(result)
+
 },
 updateHoursRefused: async(req, res) => {
   await SuppHours.findByIdAndUpdate(req.query.id, {status : "Refused"});
