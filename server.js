@@ -13,6 +13,8 @@ const express = require('express'),
 
     app = express();
 // create connection
+const path = require("path");
+
 mongoose.connect(config.database, (err) => {
     if (err) throw err;
     console.log("connected to mongo");
@@ -39,6 +41,7 @@ middleware(apiRoutes);
 //route config 
 //firewall route 
 app.use('/api', apiRoutes);
+app.use("/public", express.static(path.join(__dirname, 'public')));
 //api routes 
 routes(app, apiRoutes);
 // listening to http://127.0.0.1:3000

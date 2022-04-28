@@ -34,34 +34,36 @@ module.exports = {
                 message: "Authentication failed. Wrong password.",
             });
         } else {
-            const payload = {
-                admin: user.admin,
-            };
+            
+              const payload = {
+                  admin: user.admin,
+              };
 
-            var token = jwt.sign(payload, 'kjhkhkjh', {
-                expiresIn: "2 days",
-            });
+              var token = jwt.sign(payload, 'kjhkhkjh', {
+                  expiresIn: "2 days",
+              });
 
-            // return the information including token as JSON
-            res.json({
-                success: true,
-                message: "Enjoy your token!",
-                idToken: token,
-                expiresIn: 1440,
-                user: user,
-            });
+              // return the information including token as JSON
+              res.json({
+                  success: true,
+                  message: "Enjoy your token!",
+                  idToken: token,
+                  expiresIn: 1440,
+                  user: user,
+              });
+            
         }
     }
 },
   deleteUser: async (req, res) => {
     try {
-      console.log("object...................");
-      const result = await User.findOneAndDelete({ _id: req.params.id });
-
+      console.log(req)
+      const user = await User.findOneAndUpdate(req.query._id, {accountStatus: "disabled"})
       return res.status(200).send();
     } catch (error) {
       res.status(500).send({ error });
     }
+    
   },
 
   addSanction: async (req, res) => {

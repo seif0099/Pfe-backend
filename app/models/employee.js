@@ -17,7 +17,7 @@ var employeeSchema = new mongoose.Schema({
   sitFam:{type : String ,required : true},
   adresse:{type : String ,required : true},
   dateEmb:{type : Date ,required : true},
-
+  accountStatus:{type: String, required: true},
 
   leaveApplication: [{ type: Schema.Types.ObjectId, ref: "LeaveApplication" }],
   sanction: [{ type: Schema.Types.ObjectId, ref: "sanction" }],

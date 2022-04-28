@@ -33,8 +33,15 @@ module.exports = {
                     message: "Authentication failed. Wrong password.",
                 });
             } else {
+                if(user.accountStatus === "disabled"){
+                    res.json({
+                      success: false,
+                      message: "Authentication failed. Account disabled.",
+                  });
+                  }
+                  else {
                 const payload = {
-                    admin: user.admin,
+                    user: user.user,
                 };
 
                 var token = jwt.sign(payload, 'kjhkhkjh', {
@@ -50,6 +57,7 @@ module.exports = {
                     user: user,
                 });
             }
+            }
         }
     },
 
@@ -61,6 +69,7 @@ module.exports = {
             }
             let data = req.body
             data.password= Encrypt(req.body.password)
+            data.accountStatus = "enabled"
             var newUser = new User(data);
 
             newUser.save(function(err, data) {
@@ -79,9 +88,14 @@ module.exports = {
 
 
     UpdateUser: async(req, res) => {
+        let data = req.body
+        if(data.password!=""){
+            data.password = Encrypt(data.password)
+        }
         console.log(req.body.userid)
-        Object.keys(req.body).forEach((k) => req.body[k] == '' && delete req.body[k]);
-       await User.findByIdAndUpdate(req.body.userid, req.body);
+        Object.keys(data).forEach((k) => data[k] == '' && delete data[k]);
+        console.log(data)
+        await User.findByIdAndUpdate(req.body.userid, data);
         
         res.status(200).json({ success: true });
         console.log(req.body)
@@ -97,19 +111,35 @@ module.exports = {
     },
 
     updateProfilePic: async(req, res) => {
-        upload(req, res, function(err) {
-            if (err) {
-                res.json({ error_code: 1, err_desc: err });
-                return;
-            }
+        const path = require("path");
+        const multer = require("multer");
 
-            User.update({ _id: req.params.userid }, { profilepicUrl: req.file.filename },
-                (err, user) => {
-                    if (err) throw err;
-                }
-            );
-            res.json({ error_code: 0, err_desc: null });
+        const storage = multer.diskStorage({
+        destination: "./public/uploads/",
+        filename: function(req, file, cb){
+            cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
+        }
         });
+
+        const upload = multer({
+        storage: storage,
+        limits:{fileSize: 1000000},
+        }).single("myImage");
+        upload(req, res, (err) => {
+            console.log("Request ---", req.body);
+            console.log("Request file ---", req.file);//Here you get file.
+            /*Now do where ever you want to do*/
+            if(!err)
+               return res.send(200).end();
+         });
+        /*
+        try{
+            console.log(req)
+            res.status(200).json({ success: true });
+        }
+        catch(error){
+            res.send(500).json({message: "server error"})
+        }*/
     },
 
 
@@ -234,22 +264,26 @@ module.exports = {
         const myUser = await User.findById(userId);
         console.log(userId)
         /*const pointages = await Pointage.find({'user': myUser})*/
-        
-        const pointages = await Pointage.aggregate(
-            [{
-                $addFields: {  
-                    "month" : {$month: '$pDate'},
-                    "year" : {$year: '$pDate'},
-                    "day": {$dayOfMonth: '$pDate'}
-                },
-                
-            }]
-        )
-        mDate.setMonth(mDate.getMonth()+1);
-        console.log(mDate.getMonth());
+        try {
+            const pointages = await Pointage.aggregate(
+                [{
+                    $addFields: {  
+                        "month" : {$month: '$pDate'},
+                        "year" : {$year: '$pDate'},
+                        "day": {$dayOfMonth: '$pDate'}
+                    },
+                    
+                }]
+            )
+            mDate.setMonth(mDate.getMonth()+1);
+            console.log(mDate.getMonth());
 
-        const p = pointages.filter(a => (a.month == mDate.getMonth() && a.user == userId && a.year == mDate.getFullYear()));
-        res.status(200).send(p);
+            const p = pointages.filter(a => (a.month == mDate.getMonth() && a.user == userId && a.year == mDate.getFullYear()));
+            res.status(200).send(p);
+        }
+        catch(error){
+            res.send({"error": error})
+        }
     }
 
 

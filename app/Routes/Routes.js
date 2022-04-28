@@ -17,6 +17,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/logout").get(UserServices.logout);
   app.route("/requestSuppHours").post(Uservice.requestSuppHours);
   app.route("/userupdated").post(UserServices.UpdateUser);
+  app.route("/updateImage").post(UserServices.updateProfilePic);
 
   app.route("/requestrapport").post(Uservice.requestRapport);
   app.route("/getpointage").get(UserServices.getPointage)
@@ -29,7 +30,7 @@ module.exports = (app, apiRoutes) => {
 
   app.route("/users").get(adminService.GetAllUsers);
   app.route("/users/:userid").get(adminService.GetUserById);
-  app.route("/adminDeleteUser/:id").delete(adminService.deleteUser);
+  app.route("/adminDeleteUser").delete(adminService.deleteUser);
   app.route("/addsanction").post(adminService.addSanction);
   app.route("/deletesanction/:id").delete(adminService.deleteSanction);
   app.route("/updatesanction/:id").put(adminService.updateSanction);
