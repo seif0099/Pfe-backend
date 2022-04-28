@@ -41,7 +41,7 @@ module.exports = {
                   }
                   else {
                 const payload = {
-                    user: user.user,
+                    admin: user.admin,
                 };
 
                 var token = jwt.sign(payload, 'kjhkhkjh', {
@@ -70,6 +70,7 @@ module.exports = {
             let data = req.body
             data.password= Encrypt(req.body.password)
             data.accountStatus = "enabled"
+            data.imageProfile = "avatar.png"
             var newUser = new User(data);
 
             newUser.save(function(err, data) {
@@ -110,16 +111,21 @@ module.exports = {
         });
     },
 
-    updateProfilePic: async(req, res) => {
+    updateProfilePic: async (req, res) => {
         const path = require("path");
         const multer = require("multer");
+        var fichier = ""
 
         const storage = multer.diskStorage({
         destination: "./public/uploads/",
         filename: function(req, file, cb){
             cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
+            fichier = "IMAGE-" + Date.now() + path.extname(file.originalname)
+        
+        console.log("aaaaaaaaaa",fichier)
         }
         });
+
 
         const upload = multer({
         storage: storage,
@@ -129,9 +135,9 @@ module.exports = {
             console.log("Request ---", req.body);
             console.log("Request file ---", req.file);//Here you get file.
             /*Now do where ever you want to do*/
-            if(!err)
-               return res.send(200).end();
-         });
+          
+       
+
         /*
         try{
             console.log(req)
@@ -140,6 +146,14 @@ module.exports = {
         catch(error){
             res.send(500).json({message: "server error"})
         }*/
+
+    
+  });
+  console.log("aaaaaaaaaa",fichier)
+ const result = await User.findByIdAndUpdate(req.query.id,{imageProfile : fichier});
+  
+    return res.send(200).end();
+
     },
 
 

@@ -122,7 +122,7 @@ module.exports = {
     });
   },
   GetUserById: async (req, res) => {
-    User.find({ _id: req.params.userid }, (err, user) => {
+    User.find({ _id: req.query.userid }, (err, user) => {
       res.json(user[0]);
     });
   },

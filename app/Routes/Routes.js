@@ -29,7 +29,7 @@ module.exports = (app, apiRoutes) => {
 
 
   app.route("/users").get(adminService.GetAllUsers);
-  app.route("/users/:userid").get(adminService.GetUserById);
+  app.route("/getuserbyid").get(adminService.GetUserById);
   app.route("/adminDeleteUser").delete(adminService.deleteUser);
   app.route("/addsanction").post(adminService.addSanction);
   app.route("/deletesanction/:id").delete(adminService.deleteSanction);
