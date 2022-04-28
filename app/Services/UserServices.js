@@ -114,45 +114,25 @@ module.exports = {
     updateProfilePic: async (req, res) => {
         const path = require("path");
         const multer = require("multer");
-        var fichier = ""
+        
 
         const storage = multer.diskStorage({
         destination: "./public/uploads/",
         filename: function(req, file, cb){
             cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
-            fichier = "IMAGE-" + Date.now() + path.extname(file.originalname)
-        
-        console.log("aaaaaaaaaa",fichier)
         }
         });
 
-
-        const upload = multer({
+        const upload =  multer({
         storage: storage,
         limits:{fileSize: 1000000},
         }).single("myImage");
-        upload(req, res, (err) => {
-            console.log("Request ---", req.body);
-            console.log("Request file ---", req.file);//Here you get file.
-            /*Now do where ever you want to do*/
-          
-       
-
-        /*
-        try{
-            console.log(req)
-            res.status(200).json({ success: true });
-        }
-        catch(error){
-            res.send(500).json({message: "server error"})
-        }*/
-
-    
-  });
-  console.log("aaaaaaaaaa",fichier)
- const result = await User.findByIdAndUpdate(req.query.id,{imageProfile : fichier});
-  
-    return res.send(200).end();
+        upload(req, res, async function(){
+            let filename = req.file.filename;
+            const result = await User.findByIdAndUpdate(req.query.id,{imageProfile : filename});
+            return res.send(200).end();
+        });
+        
 
     },
 

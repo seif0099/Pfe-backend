@@ -122,9 +122,9 @@ module.exports = {
     });
   },
   GetUserById: async (req, res) => {
-    User.find({ _id: req.query.userid }, (err, user) => {
-      res.json(user[0]);
-    });
+    const user = await User.findOne({_id: req.query.id})
+    console.log(user)
+    res.status(200).json(user)
   },
 
 
