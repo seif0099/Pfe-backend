@@ -360,10 +360,14 @@ res.status(200).json({ success: true });
 
 createMutation: async (req, res) => {
   try {
-    const newMut = new Mutation(req.body);
-    console.log(req.body);
+    console.log(req.body.userid)
     const user = await User.findById(req.body.userid);
-    console.log(user);
+    let data = req.body
+    data.from = user.service
+    data.status = "pending"
+    console.log(data)
+    const newMut = new Mutation(data);
+    console.log("AA", newMut)
     newMut.user = user;
     await newMut.save();
     user.Mutation.push(newMut);

@@ -2,7 +2,7 @@ var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var MutationSchema = new mongoose.Schema({
 
-  from: { type: String },
+  from: { type: String, required: true },
   to: { type: String, required: true },
   reasonForMutation: { type: String,  },
   status: { type: String,  },

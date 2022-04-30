@@ -303,6 +303,7 @@ module.exports = {
                 let newRow = {}
                 newRow._id = row._id
                 newRow.to = row.to
+                newRow.from = row.from
                 newRow.nom = user.nom
                 newRow.prenom = user.prenom
                 newRow.status = row.status
@@ -311,8 +312,26 @@ module.exports = {
             }
         )
         res.status(200).send(result);
+      },
+
+      deleteMutation: async(req, res) => {
+        try{
+            const result = await Mutation.findOneAndDelete({ _id: req.query.id });
+            if (result) {
+                const userUpdated = await User.updateOne(
+                { _id: result.user },
+                {
+                    $pull: {
+                    mutual: ObjectId(req.params.id),
+                    },
+                }
+                );
+                res.status(200).send({success: "true"});
+            }
+        }
+        catch(e){
+            res.status(500).send({success: "false"})
+        }
       }
-
-
 
 }
