@@ -8,6 +8,7 @@ const mission = require("../models/mission");
 const Rapport = require("../models/rapport");
 const Pointage = require("../models/pointage");
 const Notification = require("../models/notif");
+const Mutation = require("../models/mutation");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -291,7 +292,26 @@ module.exports = {
         const user = await User.findById(req.query.id);
         const notifs = await Notification.find({user: user, status: "not seen"})
         res.status(200).send({notifs: notifs})
-    }
+    },
+    GetMutationById: async (req, res) => {
+        console.log(req.query.id)
+        const user = await User.findById(req.query.id);
+        const mutation = await Mutation.find({user: user})
+        const result = []
+        mutation.map(
+            row => {
+                let newRow = {}
+                newRow._id = row._id
+                newRow.to = row.to
+                newRow.nom = user.nom
+                newRow.prenom = user.prenom
+                newRow.status = row.status
+                newRow.reasonForMutation = row.reasonForMutation
+                result.push(newRow)
+            }
+        )
+        res.status(200).send(result);
+      }
 
 
 

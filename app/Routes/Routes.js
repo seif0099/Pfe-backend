@@ -19,14 +19,19 @@ module.exports = (app, apiRoutes) => {
   app.route("/userupdated").post(UserServices.UpdateUser);
   app.route("/updateImage").post(UserServices.updateProfilePic);
 
-  app.route("/requestrapport").post(Uservice.requestRapport);
+  app.route("/requestrapport").post(UserServices.requestRapport);
   app.route("/getpointage").get(UserServices.getPointage)
+
+
+  app.route("/getmutation").get(UserServices.GetMutationById);
+
 
   app.route("/leaveupdated").put(leaveServices.updateLeave);
   app.route("/deleteleave").delete(leaveServices.deleteLeave);
   app.route("/requestleave").post(leaveServices.requestLeave);
   app.route("/getrequest").get(leaveServices.GetRequestById);
   app.route("/getNotifications").get(UserServices.GetNotifications);
+
 
 
   app.route("/users").get(adminService.GetAllUsers);
@@ -56,7 +61,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/adminSuppHours").get(adminService.getAllHours);
   app.route("/adminSuppHoursRefuse").put(adminService.updateHoursRefused);
   app.route("/adminSuppHoursAccept").put(adminService.updateHoursAccepted);
-  app.route("/adminMutation").post(adminService.createMutation);
+  app.route("/demandeMutation").post(adminService.createMutation);
 
 
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);
