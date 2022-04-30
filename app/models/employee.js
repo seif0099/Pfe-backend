@@ -29,6 +29,7 @@ var employeeSchema = new mongoose.Schema({
   pointage: [{ type: Schema.Types.ObjectId, ref: "pointage" }],
   rapport: [{ type: Schema.Types.ObjectId, ref: "rapport" }],
   Mutation: [{ type: Schema.Types.ObjectId, ref: "Mutation" }],
+  notifications: [{ type: Schema.Types.ObjectId, ref: "Notification" }],
 
 });
 var Employee = mongoose.model("Employee", employeeSchema);

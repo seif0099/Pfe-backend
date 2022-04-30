@@ -11,6 +11,10 @@ const mutual = require("../models/mutualPaper");
 const Pointage = require("../models/pointage");
 const SuppHours = require("../models/suppHours");
 const Mutation = require("../models/mutation");
+const { GetEvents } = require("./leaveService");
+const SSEClient = require("../SSEClient");
+const express = require("express");
+const Notification = require("../models/notif");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -272,12 +276,56 @@ module.exports = {
     res.status(200).json(result)
   },
   updateLeaveRefused: async(req, res) => {
-    await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
+    const leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
+    const user = await User.findById(leave.user._id);
+    console.log(leave)
+    console.log(user)
 
+    const notif = new Notification({
+      user: user,
+      status: "not seen",
+      type: "leave",
+      leaveApplication: leave
+    })
+    notif.save();
     res.status(200).json({ success: true });
 },
 updateLeaveAccepted: async(req, res) => {
   await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Accepted"});
+
+  /*const donation = {
+    user: 0,
+    amount: 0
+  };
+  const SEND_INTERVAL = 2000;
+
+  const writeEvent = (res, sseId, data) => {
+    res.write(`id: ${sseId}\n`);
+    res.write(`data: ${data}\n\n`);
+  };
+
+  const sendEvent = (_req, res) => {
+    res.writeHead(200, {
+      'Cache-Control': 'no-cache',
+      Connection: 'keep-alive',
+      'Content-Type': 'text/event-stream',
+    });
+
+    const sseId = new Date().toDateString();
+
+    setInterval(() => {
+      writeEvent(res, sseId, JSON.stringify(donation));
+    }, SEND_INTERVAL);
+
+    writeEvent(res, sseId, JSON.stringify(donation));
+
+    if (req.headers.accept === 'text/event-stream') {
+      sendEvent(req, res);
+    } else {
+      res.json({ message: 'Ok' });
+    }
+  };*/
+
 
   res.status(200).json({ success: true });
 },

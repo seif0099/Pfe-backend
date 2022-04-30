@@ -7,6 +7,7 @@ const SuppHours = require("../models/suppHours");
 const mission = require("../models/mission");
 const Rapport = require("../models/rapport");
 const Pointage = require("../models/pointage");
+const Notification = require("../models/notif");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -93,13 +94,10 @@ module.exports = {
         if(data.password!=""){
             data.password = Encrypt(data.password)
         }
-        console.log(req.body.userid)
         Object.keys(data).forEach((k) => data[k] == '' && delete data[k]);
-        console.log(data)
         await User.findByIdAndUpdate(req.body.userid, data);
         
         res.status(200).json({ success: true });
-        console.log(req.body)
     },
 
 
@@ -140,7 +138,6 @@ module.exports = {
     deleteUser: async(req, res) => {
 
         try {
-            console.log("object...................")
             const result = await User.findOneAndDelete({ '_id': req.params.id });
 
             return res.status(200).send()
@@ -157,9 +154,7 @@ module.exports = {
 
         try {
             const newReq = new SuppHours(req.body);
-            console.log(req.body);
             const user = await User.findById(req.body.userid);
-            console.log(user)
             newReq.user = user;
             newReq.status = "pending"
             await newReq.save();
@@ -236,9 +231,7 @@ module.exports = {
 
         try {
             const newRapp = new Rapport(req.body);
-            console.log(req.body);
             const user = await User.findById(req.body.userid);
-            console.log(user)
             newRapp.user = user;
             await newRapp.save();
             user.Rapport.push(newRapp);
@@ -256,8 +249,6 @@ module.exports = {
         const mDate = new Date(req.query.pDate)
         const userId = req.query.userId;
         const myUser = await User.findById(userId);
-        console.log(userId)
-        /*const pointages = await Pointage.find({'user': myUser})*/
         try {
             const pointages = await Pointage.aggregate(
                 [{
@@ -270,14 +261,36 @@ module.exports = {
                 }]
             )
             mDate.setMonth(mDate.getMonth()+1);
-            console.log(mDate.getMonth());
-
-            const p = pointages.filter(a => (a.month == mDate.getMonth() && a.user == userId && a.year == mDate.getFullYear()));
-            res.status(200).send(p);
+            
+            const leaves = await LeaveApplication.aggregate(
+                [{
+                    $addFields: {  
+                        "monthF" : {$month: '$fromDate'},
+                        "yearF" : {$year: '$fromDate'},
+                        "dayF": {$dayOfMonth: '$fromDate'},
+                        "monthT" : {$month: '$toDate'},
+                        "yearT" : {$year: '$toDate'},
+                        "dayT": {$dayOfMonth: '$toDate'}
+                    },
+                    
+                }]
+            )
+            let pMonth = mDate.getMonth()
+            let pYear = mDate.getFullYear()
+            console.log(leaves)
+            const leavesResult = leaves.filter(a => ((((a.monthF == pMonth) && (a.yearF == pYear))|| ((a.monthT == pMonth)&&(a.yearT == pYear))) && a.user == userId && a.status === "Accepted"))
+            const pointageResult = pointages.filter(a => (a.month == pMonth && a.user == userId && a.year == pYear));
+            console.log("poi", pointages)
+            res.status(200).send({pointage: pointageResult, leave: leavesResult});
         }
         catch(error){
             res.send({"error": error})
         }
+    },
+    GetNotifications: async(req, res) => {
+        const user = await User.findById(req.query.id);
+        const notifs = await Notification.find({user: user, status: "not seen"})
+        res.status(200).send({notifs: notifs})
     }
 
 
