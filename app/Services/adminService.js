@@ -381,7 +381,8 @@ createMutation: async (req, res) => {
 },
 getAllMissions: async(req, res) => {
   try {
-      let missions = await mission.find();
+      let missions = await mission.find().populate("user");
+      console.log(missions)
       res.status(200).json(missions)
   }
   catch(e){
