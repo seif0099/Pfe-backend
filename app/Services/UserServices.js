@@ -332,6 +332,38 @@ module.exports = {
         catch(e){
             res.status(500).send({success: "false"})
         }
-      }
+      },
+      updateMutation: async(req, res) => {
+          try{
+              console.log("a", req.body)
+              const mutation = await Mutation.findByIdAndUpdate(req.query.id, req.body)
+              res.status(200).send({success: "true"})
+          }
+          catch(e){
+              res.status(500).send({success: "false"})
+          }
+      },
+      getMissions: async(req, res) => {
+          try {
+              let user = await User.findById(req.query.id);
+              let missions = await mission.find({user: user});
+              res.status(200).json(missions)
+          }
+          catch(e){
+            res.status(500).send({success: "false"})
+          }
+      },
+      submitReport: async(req, res) => {
+        try {
+            let data = req.body
+            data.status = "terminée"
+            data.dateValidation = new Date();
+            let missions = await mission.findByIdAndUpdate(req.query.id, data);
+            res.status(200).json({success: "true"})
+        }
+        catch(e){
+          res.status(500).send({success: "false"})
+        }
+      },
 
 }

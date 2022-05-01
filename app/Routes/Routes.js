@@ -55,6 +55,8 @@ module.exports = (app, apiRoutes) => {
   app.route("/admin-signin").post(adminService.Authenticate);
 
   app.route("/adminRequests").get(adminService.GetAllRequests);
+  app.route("/getallmissions").get(adminService.getAllMissions);
+
   app.route("/adminRequestsRefuse").put(adminService.updateLeaveRefused);
   app.route("/adminRequestsAccept").put(adminService.updateLeaveAccepted);
 
@@ -63,6 +65,9 @@ module.exports = (app, apiRoutes) => {
   app.route("/adminSuppHoursAccept").put(adminService.updateHoursAccepted);
   app.route("/demandeMutation").post(adminService.createMutation);
   app.route("/deletesMutation").put(UserServices.deleteMutation);
+  app.route("/mutationUpdated").put(UserServices.updateMutation);
+  app.route("/getmissions").get(UserServices.getMissions);
+  app.route("/submitreport").put(UserServices.submitReport);
 
 
   //apiRoutes.route('/users').get(Uservice.GetAllUsers);

@@ -154,17 +154,16 @@ module.exports = {
 
   createMission: async (req, res) => {
     try {
-      const newMission = new mission(req.body);
-      console.log(req.body);
-      const user = await User.findById(req.body.userid);
-      console.log(user);
+      let data = req.body
+      data.status = "en cours"
+      const newMission = new mission(data);
+      const user = await User.findById(req.query.id);
       newMission.user = user;
       await newMission.save();
       user.mission.push(newMission);
       await user.save();
       let missions = await mission.find({}).populate("Employee");
-
-      res.send(missions);
+      res.status(200).send(missions);
     } catch (error) {
       console.log(error);
       res.send("err");
@@ -378,6 +377,15 @@ createMutation: async (req, res) => {
   } catch (error) {
     console.log(error);
     res.send("err");
+  }
+},
+getAllMissions: async(req, res) => {
+  try {
+      let missions = await mission.find();
+      res.status(200).json(missions)
+  }
+  catch(e){
+    res.status(500).send({success: "false"})
   }
 },
   }

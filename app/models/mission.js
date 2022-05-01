@@ -2,11 +2,16 @@ var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 
 var ordreMission = new mongoose.Schema({
-    objetctMission: { type: String, required: true },
+    objectifMission: { type: String, required: true },
     destination: { type: String, required: true },
-    dateDepart: { type: String, required: true },
-    dateRetour: { type: String, required: true },
-
+    dateDepart: { type: Date, required: true },
+    dateRetour: { type: Date, required: true },
+    dateValidation: { type: String },
+    status: { type: String, required: true },
+    coutdejuner: { type: Number },
+    coutdiner: { type: Number },
+    couthebergement: { type: Number },
+    couttransport: { type: Number },
     user: {
         type: Schema.Types.ObjectId,
         ref: 'Employee'
