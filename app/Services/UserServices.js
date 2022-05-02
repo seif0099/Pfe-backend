@@ -19,8 +19,28 @@ var Encrypt = function(string) {
     var encrypted = hash.hex();
     return encrypted;
 };
+function updateToken(user){
+    const payload = {
+        user: user.user,
+    };
+    var token = jwt.sign(payload, 'kjhkhkjh', {
+        expiresIn: "2 days",
+    });
+    let response = {
+        _id: user._id,
+        nom: user.nom,
+        prenom: user.prenom,
+        email: user.email,
+        sitFam: user.sitFam,
+        adresse: user.adresse,
+        tel: user.tel,
+        imageProfile: user.imageProfile,
+        service: user.service
+    }
+    return {token: token, response: response}
+};
 module.exports = {
-    Authenticate: async(req, res) => {
+    SignIn: async(req, res) => {
         let user = await User.findOne({ email: req.body.email });
            
         if (!user) {
@@ -42,28 +62,20 @@ module.exports = {
                   });
                   }
                   else {
-                const payload = {
-                    admin: user.admin,
-                };
-
-                var token = jwt.sign(payload, 'kjhkhkjh', {
-                    expiresIn: "2 days",
-                });
-
+                let response = updateToken(user)
                 // return the information including token as JSON
                 res.json({
                     success: true,
-                    message: "Enjoy your token!",
-                    idToken: token,
+                    idToken: response.token,
                     expiresIn: 1440,
-                    user: user,
+                    user: response.response,
                 });
             }
             }
         }
     },
 
-    SignIn: async (req, res) => {
+    SignUp: async (req, res) => {
         try {
             let account = await User.findOne({email: req.body.email})
             if(account){
@@ -91,14 +103,22 @@ module.exports = {
 
 
     UpdateUser: async(req, res) => {
+        const SECRET= "securep4ssword"
         let data = req.body
         if(data.password!=""){
             data.password = Encrypt(data.password)
         }
         Object.keys(data).forEach((k) => data[k] == '' && delete data[k]);
         await User.findByIdAndUpdate(req.body.userid, data);
-        
-        res.status(200).json({ success: true });
+        let user = await User.findById(req.body.userid);
+        let response = updateToken(user)
+        // return the information including token as JSON
+        res.status(200).json({
+            success: true,
+            idToken: response.token,
+            expiresIn: 1440,
+            user: response.response,
+        });
     },
 
 
@@ -111,6 +131,7 @@ module.exports = {
     },
 
     updateProfilePic: async (req, res) => {
+        const SECRET= "securep4ssword"
         const path = require("path");
         const multer = require("multer");
         
@@ -129,7 +150,14 @@ module.exports = {
         upload(req, res, async function(){
             let filename = req.file.filename;
             const result = await User.findByIdAndUpdate(req.query.id,{imageProfile : filename});
-            return res.send(200).end();
+            let user = await User.findById(req.query.id);
+            let response = updateToken(user)
+            res.status(200).json({
+                success: true,
+                idToken: response.token,
+                expiresIn: 1440,
+                user: response.response,
+            });
         });
         
 
@@ -154,7 +182,14 @@ module.exports = {
     requestSuppHours: async(req, res) => {
 
         try {
-            const newReq = new SuppHours(req.body);
+            console.log(req.body)
+            let data = {
+                typeOfWork: req.body.typeOfWork,
+                fromDate:req.body.fromDate, 
+                toDate:req.body.toDate,
+                date: req.body.date
+            }
+            const newReq = new SuppHours(data);
             const user = await User.findById(req.body.userid);
             newReq.user = user;
             newReq.status = "pending"
@@ -192,34 +227,6 @@ module.exports = {
     },
 
 
-
-
-    /* updateLeave: async(req, res) => {
-         try {
-             const updatedLeaveData = new LeaveApplication(req.body)
-             console.log("--------------", updatedLeaveData)
-
-             await LeaveApplication.findOneAndUpdate(req.params.id, {
-                     $set: {
-                         Leavetype: req.body.Leavetype,
-                         FromDate: req.body.FromDate,
-                         ToDate: req.body.ToDate,
-                         Reasonforleave: req.body.Reasonforleave,
-                         Status: req.body.Status,
-                         userid: req.body.userid
-                     }
-                 },
-
-             ).then((LeaveApplication));
-
-             res.status(200).json({ success: true });
-         } catch (error) {
-
-             res.status(500).send({ error })
-         }
-
-     }*/
-
     updateReqHours: async(req, res) => {
         await SuppHours.findByIdAndUpdate(req.params.id, req.body);
 
@@ -232,10 +239,11 @@ module.exports = {
 
         try {
             const newRapp = new Rapport(req.body);
-            const user = await User.findById(req.body.userid);
+            const user = await User.findById(req.query.id);
+            console.log(newRapp)
             newRapp.user = user;
             await newRapp.save();
-            user.Rapport.push(newRapp);
+            user.rapport.push(newRapp);
             await user.save();
             let rapp = await Rapport.find({}).populate('Employee');
 
@@ -293,6 +301,7 @@ module.exports = {
         const notifs = await Notification.find({user: user, status: "not seen"})
         res.status(200).send({notifs: notifs})
     },
+
     GetMutationById: async (req, res) => {
         console.log(req.query.id)
         const user = await User.findById(req.query.id);
@@ -359,6 +368,7 @@ module.exports = {
             data.status = "terminée"
             data.dateValidation = new Date();
             let missions = await mission.findByIdAndUpdate(req.query.id, data);
+            let notif = await Notification.findOneAndUpdate({mission: missions}, {status: "seen"})
             res.status(200).json({success: "true"})
         }
         catch(e){

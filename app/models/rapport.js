@@ -1,11 +1,9 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
 var RapportSchema = new mongoose.Schema({
-  nom: { type: String, required: true },
-  prenom: { type: String, required: true },
   dateAcc: { type: Date, required: true },
-  place: { type: Date, required: true },
-  condition: { type: String,  },
+  place: { type: String, required: true },
+  condition: { type: String,  required: true},
  
   user: {
     type: Schema.Types.ObjectId,

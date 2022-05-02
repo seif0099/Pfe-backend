@@ -11,8 +11,8 @@ module.exports = (app, apiRoutes) => {
     res.send("server working..");
   });
   // todoList Routes
-  app.route("/Authenticate").post(Uservice.Authenticate);
-  app.route("/register").post(Uservice.SignIn);
+  app.route("/Authenticate").post(Uservice.SignIn);
+  app.route("/register").post(Uservice.SignUp);
   app.route("/userdeleted/:id").delete(UserServices.deleteUser);
   app.route("/logout").get(UserServices.logout);
   app.route("/requestSuppHours").post(Uservice.requestSuppHours);

@@ -163,6 +163,13 @@ module.exports = {
       user.mission.push(newMission);
       await user.save();
       let missions = await mission.find({}).populate("Employee");
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "mission",
+        mission: newMission
+      })
+      notif.save();
       res.status(200).send(missions);
     } catch (error) {
       console.log(error);
@@ -277,9 +284,6 @@ module.exports = {
   updateLeaveRefused: async(req, res) => {
     const leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
     const user = await User.findById(leave.user._id);
-    console.log(leave)
-    console.log(user)
-
     const notif = new Notification({
       user: user,
       status: "not seen",
@@ -290,42 +294,14 @@ module.exports = {
     res.status(200).json({ success: true });
 },
 updateLeaveAccepted: async(req, res) => {
-  await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Accepted"});
-
-  /*const donation = {
-    user: 0,
-    amount: 0
-  };
-  const SEND_INTERVAL = 2000;
-
-  const writeEvent = (res, sseId, data) => {
-    res.write(`id: ${sseId}\n`);
-    res.write(`data: ${data}\n\n`);
-  };
-
-  const sendEvent = (_req, res) => {
-    res.writeHead(200, {
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
-      'Content-Type': 'text/event-stream',
-    });
-
-    const sseId = new Date().toDateString();
-
-    setInterval(() => {
-      writeEvent(res, sseId, JSON.stringify(donation));
-    }, SEND_INTERVAL);
-
-    writeEvent(res, sseId, JSON.stringify(donation));
-
-    if (req.headers.accept === 'text/event-stream') {
-      sendEvent(req, res);
-    } else {
-      res.json({ message: 'Ok' });
-    }
-  };*/
-
-
+  let leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Accepted"});
+  const user = await User.findById(leave.user._id);
+  const notif = new Notification({
+    user: user,
+    status: "not seen",
+    type: "leave",
+    leaveApplication: leave
+  })
   res.status(200).json({ success: true });
 },
 getAllHours: async (req, res) => {
