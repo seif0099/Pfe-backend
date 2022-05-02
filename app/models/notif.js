@@ -6,6 +6,7 @@ var notificationSchema = new mongoose.Schema({
   status: { type: String ,required : true},
 
   type: { type: String ,required : true},
+  role: { type: String ,required : true},
 
   leaveApplication: { type: Schema.Types.ObjectId, ref: "LeaveApplication" },
   sanction: [{ type: Schema.Types.ObjectId, ref: "sanction" }],
