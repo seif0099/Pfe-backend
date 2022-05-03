@@ -299,7 +299,7 @@ module.exports = {
     },
     GetNotifications: async(req, res) => {
         const user = await User.findById(req.query.id);
-        const notifs = await Notification.find({user: user, status: "not seen"})
+        const notifs = await Notification.find({user: user, status: "not seen", role: "user"})
         res.status(200).send({notifs: notifs})
     },
 

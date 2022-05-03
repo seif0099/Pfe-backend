@@ -80,6 +80,14 @@ module.exports = {
       await newSanction.save();
       user.sanction.push(newSanction);
       await user.save();
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "sanction",
+        role: "user",
+        sanction: newSanction
+      })
+      notif.save();
       let sanctions = await sanction.find({}).populate("Employee");
 
       res.send(sanctions);
@@ -143,6 +151,14 @@ module.exports = {
       user.promotion.push(newProm);
       user.poste = req.body.newPoste
       await user.save();
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "promotion",
+        role: "user",
+        promotion: newProm
+      })
+      notif.save();
       let proms = await promotion.find({}).populate("Employee");
 
       res.status(200).json({message: "Promotion crée avec succés"})
@@ -167,6 +183,7 @@ module.exports = {
         user: user,
         status: "not seen",
         type: "mission",
+        role: "user",
         mission: newMission
       })
       notif.save();
@@ -288,6 +305,7 @@ module.exports = {
       user: user,
       status: "not seen",
       type: "leave",
+      role: "user",
       leaveApplication: leave
     })
     notif.save();
@@ -300,6 +318,7 @@ updateLeaveAccepted: async(req, res) => {
     user: user,
     status: "not seen",
     type: "leave",
+    role: "user",
     leaveApplication: leave
   })
   res.status(200).json({ success: true });
@@ -322,12 +341,30 @@ getAllHours: async (req, res) => {
 },
 updateHoursRefused: async(req, res) => {
   await SuppHours.findByIdAndUpdate(req.query.id, {status : "Refused"});
-
+  let supphours = await SuppHours.findById(req.query.id)
+  let user = await User.findById(supphours.user)
+  const notif = new Notification({
+    user: user,
+    status: "not seen",
+    type: "supphours",
+    role: "user",
+    SuppHours: supphours
+  })
+  notif.save();
   res.status(200).json({ success: true });
 },
 updateHoursAccepted: async(req, res) => {
 await SuppHours.findByIdAndUpdate(req.query.id, {status : "Accepted"});
-
+let supphours = await SuppHours.findById(req.query.id)
+  let user = await User.findById(supphours.user)
+  const notif = new Notification({
+    user: user,
+    status: "not seen",
+    type: "supphours",
+    role: "user",
+    SuppHours: supphours
+  })
+  notif.save();
 res.status(200).json({ success: true });
 },
 
@@ -355,6 +392,11 @@ createMutation: async (req, res) => {
     res.send("err");
   }
 },
+getMutations: async(req, res) => {
+  let result = await Mutation.find({status: "pending"}).populate("user")
+  console.log(result)
+  res.status(200).send({result: result})
+},
 getAllMissions: async(req, res) => {
   try {
       let missions = await mission.find().populate("user");
@@ -365,5 +407,38 @@ getAllMissions: async(req, res) => {
     res.status(500).send({success: "false"})
   }
 },
+updateMutation: async(req, res) => {
+  try{
+    console.log(req.query)
+    await Mutation.findByIdAndUpdate(req.query.id, {status: req.query.status});
+    let mutation = await Mutation.findById(req.query.id);
+    let user = await User.findById(mutation.user)
+    const notif = new Notification({
+      user: user,
+      status: "not seen",
+      type: "mutation",
+      role: "user",
+      Mutation: mutation
+    })
+    notif.save();
+
+    res.status(200).send({success: "true"})
+
   }
+  catch(e){
+    console.log(e)
+    res.status(500).send({success: "false"})
+  }
+},
+getAdminNotifications: async(req, res) => {
+  try{
+    let notifs = await Notification.find({role: "admin", status: "not seen"})
+    res.status(200).send({notifs: notifs})
+  }
+  catch(e){
+    console.log(e)
+    res.status(500).send({success: "false"})
+  }
+}
+}
 
