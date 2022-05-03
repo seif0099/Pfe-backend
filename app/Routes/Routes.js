@@ -31,6 +31,10 @@ module.exports = (app, apiRoutes) => {
   app.route("/requestleave").post(leaveServices.requestLeave);
   app.route("/getrequest").get(leaveServices.GetRequestById);
   app.route("/getNotifications").get(UserServices.GetNotifications);
+  app.route("/deletereqhours").delete(UserServices.deleteReqHours);
+  app.route("/getreqhours").get(UserServices.GetReqHoursById);
+
+
 
 
 

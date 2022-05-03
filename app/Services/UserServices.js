@@ -209,11 +209,12 @@ module.exports = {
     deleteReqHours: async(req, res) => {
 
         try {
-            const result = await SuppHours.findOneAndDelete({ '_id': req.params.id });
+            const result = await SuppHours.findOneAndDelete({ '_id': req.query.id });
             if (result) {
                 const userUpdated = await User.updateOne({ '_id': result.user }, {
                     $pull: {
-                        SuppHours: ObjectId(req.params.id)
+                        SuppHours: ObjectId(req.query.id),
+                        status : "Refused"
                     }
                 })
                 return res.status(200).send()
@@ -418,5 +419,29 @@ module.exports = {
             res.status(500).send({success: "false"})
         }
     },
+
+
+    GetReqHoursById: async (req, res) => {
+        console.log(req.query.id)
+        const user = await User.findById(req.query.id);
+        const leaves = await SuppHours.find({user: user})
+        const result = []
+        leaves.map(
+            row => {
+                let newRow = {}
+                newRow._id = row._id
+                newRow.fromDate = row.fromDate
+                newRow.toDate = row.toDate
+                newRow.nom = user.nom
+                newRow.prenom = user.prenom
+                newRow.status = row.status
+                newRow.date = row.date
+
+                newRow.typeOfWork = row.typeOfWork
+                result.push(newRow)
+            }
+        )
+        res.status(200).send(result);
+      },
 
 }
