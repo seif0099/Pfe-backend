@@ -9,6 +9,7 @@ const Rapport = require("../models/rapport");
 const Pointage = require("../models/pointage");
 const Notification = require("../models/notif");
 const Mutation = require("../models/mutation");
+const Demande = require("../models/demande");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -375,5 +376,30 @@ module.exports = {
           res.status(500).send({success: "false"})
         }
       },
+
+
+
+      requestDemande: async(req, res) => {
+
+        try {
+            console.log(req.body)
+            let data = {
+                sujet: req.body.sujet,
+                
+            }
+            const newReq = new Demande(data);
+            const user = await User.findById(req.body.userid);
+            newReq.user = user;
+            await newReq.save();
+            user.Demande.push(newReq);
+            await user.save();
+            let reqs = await Demande.find({}).populate('Employee');
+
+            res.send(reqs)
+        } catch (error) {
+            console.log(error);
+            res.send("err");
+        }
+    },
 
 }
