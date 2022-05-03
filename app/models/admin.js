@@ -8,6 +8,7 @@ var adminSchema = new mongoose.Schema({
     prenom: { type: String, required: true },
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
+    imageProfile:{type : String},
 
     classAdm: { type: String, required: true },
     matricule: { type: String, required: true },

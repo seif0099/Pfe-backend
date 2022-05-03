@@ -15,12 +15,30 @@ const { GetEvents } = require("./leaveService");
 const SSEClient = require("../SSEClient");
 const express = require("express");
 const Notification = require("../models/notif");
+const Demande = require("../models/demande");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
   hash.update(string);
   var encrypted = hash.hex();
   return encrypted;
+};
+function updateToken(user){
+  const payload = {
+      user: user.user,
+  };
+  var token = jwt.sign(payload, 'kjhkhkjh', {
+      expiresIn: "2 days",
+  });
+  let response = {
+      _id: user._id,
+      nom: user.nom,
+      prenom: user.prenom,
+      email: user.email,
+      username: user.username,
+      imageProfile: user.imageProfile,
+  }
+  return {token: token, response: response}
 };
 module.exports = {
   Authenticate: async(req, res) => {
@@ -39,21 +57,15 @@ module.exports = {
             });
         } else {
             
-              const payload = {
-                  admin: user.admin,
-              };
-
-              var token = jwt.sign(payload, 'kjhkhkjh', {
-                  expiresIn: "2 days",
-              });
+            let response = updateToken(user)
 
               // return the information including token as JSON
               res.json({
                   success: true,
                   message: "Enjoy your token!",
-                  idToken: token,
+                  idToken: response.token,
                   expiresIn: 1440,
-                  user: user,
+                  user: response.response,
               });
             
         }
@@ -348,6 +360,8 @@ updateHoursRefused: async(req, res) => {
   await SuppHours.findByIdAndUpdate(req.query.id, {status : "Refused"});
   let supphours = await SuppHours.findById(req.query.id)
   let user = await User.findById(supphours.user)
+  let suppId = await SuppHours.findById(req.query.id)
+  await Notification.findOneAndDelete({SuppHours: suppId, role: "admin"})
   const notif = new Notification({
     user: user,
     status: "not seen",
@@ -362,6 +376,8 @@ updateHoursAccepted: async(req, res) => {
 await SuppHours.findByIdAndUpdate(req.query.id, {status : "Accepted"});
 let supphours = await SuppHours.findById(req.query.id)
   let user = await User.findById(supphours.user)
+  let suppId = await SuppHours.findById(req.query.id)
+  await Notification.findOneAndDelete({SuppHours: suppId, role: "admin"})
   const notif = new Notification({
     user: user,
     status: "not seen",
@@ -452,6 +468,66 @@ getAdminNotifications: async(req, res) => {
     console.log(e)
     res.status(500).send({success: "false"})
   }
-}
+},
+getDemandesAdministrative: async(req, res) => {
+  try{
+    let demandes = await Demande.find().populate("user")
+    res.status(200).send({demandes: demandes})
+  }
+  catch(e){
+    console.log(e)
+    res.status(500).send({success: "false"})
+  }
+},
+updateProfilePic: async (req, res) => {
+  const SECRET= "securep4ssword"
+  const path = require("path");
+  const multer = require("multer");
+  
+
+  const storage = multer.diskStorage({
+  destination: "./public/uploads/",
+  filename: function(req, file, cb){
+      cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
+  }
+  });
+
+  const upload =  multer({
+  storage: storage,
+  limits:{fileSize: 1000000},
+  }).single("myImage");
+  upload(req, res, async function(){
+      let filename = req.file.filename;
+      const result = await admin.findByIdAndUpdate(req.query.id,{imageProfile : filename});
+      let user = await admin.findById(req.query.id);
+      let response = updateToken(user)
+      res.status(200).json({
+          success: true,
+          idToken: response.token,
+          expiresIn: 1440,
+          user: response.response,
+      });
+  });
+  
+
+},
+updateAdmin: async(req, res) => {
+  const SECRET= "securep4ssword"
+  let data = req.body
+  if(data.password!=""){
+      data.password = Encrypt(data.password)
+  }
+  Object.keys(data).forEach((k) => data[k] == '' && delete data[k]);
+  await admin.findByIdAndUpdate(req.body.userid, data);
+  let user = await admin.findById(req.body.userid);
+  let response = updateToken(user)
+  res.status(200).json({
+      success: true,
+      idToken: response.token,
+      expiresIn: 1440,
+      user: response.response,
+  });
+},
+
 }
 

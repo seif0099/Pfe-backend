@@ -197,12 +197,18 @@ module.exports = {
             await newReq.save();
             user.SuppHours.push(newReq);
             await user.save();
-            let hours = await SuppHours.find({}).populate('Employee');
-
-            res.send(hours)
+            const notif = new Notification({
+                user: user,
+                status: "not seen",
+                type: "supphours",
+                role: "admin",
+                SuppHours: newReq
+              })
+              notif.save();
+            res.status(200).json({ success: true });
         } catch (error) {
             console.log(error);
-            res.send("err");
+            res.status(500).json({ success: "false" });
         }
     },
 
@@ -301,6 +307,7 @@ module.exports = {
     GetNotifications: async(req, res) => {
         const user = await User.findById(req.query.id);
         const notifs = await Notification.find({user: user, status: "not seen", role: "user"})
+        console.log(notifs)
         res.status(200).send({notifs: notifs})
     },
 

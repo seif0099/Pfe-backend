@@ -18,7 +18,10 @@ module.exports = (app, apiRoutes) => {
   app.route("/requestSuppHours").post(Uservice.requestSuppHours);
   app.route("/userupdated").post(UserServices.UpdateUser);
   app.route("/updateImage").post(UserServices.updateProfilePic);
+  app.route("/adminUpdateImage").post(adminService.updateProfilePic);
+  app.route("/adminupdated").post(adminService.updateAdmin);
 
+  
   app.route("/requestrapport").post(UserServices.requestRapport);
   app.route("/getpointage").get(UserServices.getPointage)
 
@@ -79,5 +82,6 @@ module.exports = (app, apiRoutes) => {
 
   app.route("/updatemutation").put(adminService.updateMutation);
   app.route("/getAdminNotifications").get(adminService.getAdminNotifications);
+  app.route("/getDemandesAdministrative").get(adminService.getDemandesAdministrative);
 
 };
