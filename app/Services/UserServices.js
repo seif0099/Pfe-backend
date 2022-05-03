@@ -369,7 +369,7 @@ module.exports = {
             data.status = "terminée"
             data.dateValidation = new Date();
             let missions = await mission.findByIdAndUpdate(req.query.id, data);
-            let mission = await mission.findById(req.query.id);
+            let m = await mission.findById(req.query.id);
             let user = await User.findById(mission.user);
             let notif = await Notification.findOneAndUpdate({mission: missions}, {status: "seen"})
             const notifAdmin = new Notification({
@@ -377,12 +377,13 @@ module.exports = {
                 status: "not seen",
                 type: "mission",
                 role: "admin",
-                mission: mission
+                mission: m
               })
             notifAdmin.save();
             res.status(200).json({success: "true"})
         }
         catch(e){
+            console.log(e)
           res.status(500).send({success: "false"})
         }
       },

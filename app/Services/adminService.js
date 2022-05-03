@@ -301,6 +301,9 @@ module.exports = {
   updateLeaveRefused: async(req, res) => {
     const leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
     const user = await User.findById(leave.user._id);
+
+    let leaveId = await LeaveApplication.findById(req.query.id)
+    await Notification.findOneAndDelete({leaveApplication: leaveId, role: "admin"})
     const notif = new Notification({
       user: user,
       status: "not seen",
@@ -314,6 +317,8 @@ module.exports = {
 updateLeaveAccepted: async(req, res) => {
   let leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Accepted"});
   const user = await User.findById(leave.user._id);
+  let leaveId = await LeaveApplication.findById(req.query.id)
+  await Notification.findOneAndDelete({leaveApplication: leaveId, role: "admin"})
   const notif = new Notification({
     user: user,
     status: "not seen",
@@ -384,12 +389,18 @@ createMutation: async (req, res) => {
     await newMut.save();
     user.Mutation.push(newMut);
     await user.save();
-    let papers = await Mutation.find({}).populate("Employee");
-
-    res.send(papers);
+    const notif = new Notification({
+      user: user,
+      status: "not seen",
+      type: "mutation",
+      role: "admin",
+      Mutation: newMut
+    })
+    notif.save();
+    res.status(200).json({ success: "true" });
   } catch (error) {
     console.log(error);
-    res.send("err");
+    res.status(500).json({ success: "false" });
   }
 },
 getMutations: async(req, res) => {
@@ -412,6 +423,8 @@ updateMutation: async(req, res) => {
     console.log(req.query)
     await Mutation.findByIdAndUpdate(req.query.id, {status: req.query.status});
     let mutation = await Mutation.findById(req.query.id);
+    let mutationId = await Mutation.findById(req.query.id)
+    await Notification.findOneAndDelete({Mutation: mutationId, role: "admin"})
     let user = await User.findById(mutation.user)
     const notif = new Notification({
       user: user,

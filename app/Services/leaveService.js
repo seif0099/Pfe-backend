@@ -4,6 +4,7 @@ var admin = require("../models/admin");
 var jwt = require("jsonwebtoken");
 var sha512 = require("js-sha512");
 const SSEClient = require("../SSEClient");
+const Notification = require("../models/notif");
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 var Encrypt = function(string) {
@@ -26,13 +27,18 @@ module.exports = {
             await newLeave.save();
             user.leaveApplication.push(newLeave);
             await user.save();
-            let leaves = await LeaveApplication.find({}).populate('Employee');
-
-            res.send(leaves)
-
+            const notif = new Notification({
+                user: user,
+                status: "not seen",
+                type: "leave",
+                role: "admin",
+                leaveApplication: newLeave
+            })
+            notif.save();
+            res.status(200).json({ success: "true" });
         } catch (error) {
             console.log(error);
-            res.send("err");
+            res.status(500).json({ success: "false" });
         }
     },
 
@@ -57,35 +63,6 @@ module.exports = {
         }
 
     },
-
-
-
-
-    /* updateLeave: async(req, res) => {
-         try {
-             const updatedLeaveData = new LeaveApplication(req.body)
-             console.log("--------------", updatedLeaveData)
-
-             await LeaveApplication.findOneAndUpdate(req.params.id, {
-                     $set: {
-                         Leavetype: req.body.Leavetype,
-                         FromDate: req.body.FromDate,
-                         ToDate: req.body.ToDate,
-                         Reasonforleave: req.body.Reasonforleave,
-                         Status: req.body.Status,
-                         userid: req.body.userid
-                     }
-                 },
-
-             ).then((LeaveApplication));
-
-             res.status(200).json({ success: true });
-         } catch (error) {
-
-             res.status(500).send({ error })
-         }
-
-     }*/
 
     updateLeave: async(req, res) => {
         result = await LeaveApplication.findByIdAndUpdate(req.query.id,req.body );
