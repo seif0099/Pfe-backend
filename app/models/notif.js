@@ -17,6 +17,8 @@ var notificationSchema = new mongoose.Schema({
   pointage: [{ type: Schema.Types.ObjectId, ref: "pointage" }],
   rapport: [{ type: Schema.Types.ObjectId, ref: "rapport" }],
   Mutation: [{ type: Schema.Types.ObjectId, ref: "Mutation" }],
+  demande: [{ type: Schema.Types.ObjectId, ref: "Demande" }],
+
   user: {
     type: Schema.Types.ObjectId,
     ref: "Employee",

@@ -369,7 +369,17 @@ module.exports = {
             data.status = "terminée"
             data.dateValidation = new Date();
             let missions = await mission.findByIdAndUpdate(req.query.id, data);
+            let mission = await mission.findById(req.query.id);
+            let user = await User.findById(mission.user);
             let notif = await Notification.findOneAndUpdate({mission: missions}, {status: "seen"})
+            const notifAdmin = new Notification({
+                user: user,
+                status: "not seen",
+                type: "mission",
+                role: "admin",
+                mission: mission
+              })
+            notifAdmin.save();
             res.status(200).json({success: "true"})
         }
         catch(e){
@@ -391,14 +401,20 @@ module.exports = {
             const user = await User.findById(req.body.userid);
             newReq.user = user;
             await newReq.save();
-            user.Demande.push(newReq);
+            user.demande.push(newReq);
             await user.save();
-            let reqs = await Demande.find({}).populate('Employee');
-
-            res.send(reqs)
+            const notif = new Notification({
+                user: user,
+                status: "not seen",
+                type: "demande",
+                role: "user",
+                demande: newReq
+              })
+              notif.save();
+            res.status(200).json({success: "true"})
         } catch (error) {
             console.log(error);
-            res.send("err");
+            res.status(500).send({success: "false"})
         }
     },
 

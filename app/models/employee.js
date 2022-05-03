@@ -30,6 +30,7 @@ var employeeSchema = new mongoose.Schema({
   rapport: [{ type: Schema.Types.ObjectId, ref: "rapport" }],
   Mutation: [{ type: Schema.Types.ObjectId, ref: "Mutation" }],
   notifications: [{ type: Schema.Types.ObjectId, ref: "Notification" }],
+  demande: [{ type: Schema.Types.ObjectId, ref: "Demande" }],
 
 });
 var Employee = mongoose.model("Employee", employeeSchema);

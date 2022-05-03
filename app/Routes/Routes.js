@@ -69,9 +69,11 @@ module.exports = (app, apiRoutes) => {
   app.route("/getmissions").get(UserServices.getMissions);
   app.route("/submitreport").put(UserServices.submitReport);
   app.route("/getmutations").get(adminService.getMutations);
+  app.route("/demandeAdministrative").post(UserServices.requestDemande);
+
+  
+
   app.route("/updatemutation").put(adminService.updateMutation);
   app.route("/getAdminNotifications").get(adminService.getAdminNotifications);
 
-  
-  //apiRoutes.route('/users').get(Uservice.GetAllUsers);
 };
