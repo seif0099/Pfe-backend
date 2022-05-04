@@ -306,7 +306,6 @@ module.exports = {
             console.log(leaves)
             const leavesResult = leaves.filter(a => ((((a.monthF == pMonth) && (a.yearF == pYear))|| ((a.monthT == pMonth)&&(a.yearT == pYear))) && a.user == userId && a.status === "Accepted"))
             const pointageResult = pointages.filter(a => (a.month == pMonth && a.user == userId && a.year == pYear));
-            console.log("poi", pointages)
             res.status(200).send({pointage: pointageResult, leave: leavesResult});
         }
         catch(error){
@@ -361,7 +360,6 @@ module.exports = {
       },
       updateMutation: async(req, res) => {
           try{
-              console.log("a", req.body)
               const mutation = await Mutation.findByIdAndUpdate(req.query.id, req.body)
               res.status(200).send({success: "true"})
           }

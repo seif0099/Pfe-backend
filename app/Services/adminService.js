@@ -284,7 +284,6 @@ module.exports = {
       user.Pointage.push(newPointage);
       await user.save();
       let p = await Pointage.find({}).populate("Employee");
-      console.log("mriguel")
       res.send(p);
     } catch (error) {
       console.log(error);
@@ -401,7 +400,6 @@ createMutation: async (req, res) => {
     data.status = "pending"
     console.log(data)
     const newMut = new Mutation(data);
-    console.log("AA", newMut)
     newMut.user = user;
     await newMut.save();
     user.Mutation.push(newMut);
