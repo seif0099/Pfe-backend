@@ -77,11 +77,14 @@ module.exports = (app, apiRoutes) => {
   app.route("/submitreport").put(UserServices.submitReport);
   app.route("/getmutations").get(adminService.getMutations);
   app.route("/demandeAdministrative").post(UserServices.requestDemande);
+  app.route("/markasseen").put(UserServices.markAsSeen);
 
   
 
   app.route("/updatemutation").put(adminService.updateMutation);
   app.route("/getAdminNotifications").get(adminService.getAdminNotifications);
   app.route("/getDemandesAdministrative").get(adminService.getDemandesAdministrative);
+  app.route("/getrapportaccident").get(adminService.getAllRapports);
+
 
 };

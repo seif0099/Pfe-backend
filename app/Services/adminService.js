@@ -16,6 +16,7 @@ const SSEClient = require("../SSEClient");
 const express = require("express");
 const Notification = require("../models/notif");
 const Demande = require("../models/demande");
+const Rapport = require("../models/rapport");
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -527,6 +528,13 @@ updateAdmin: async(req, res) => {
       expiresIn: 1440,
       user: response.response,
   });
+},
+
+getAllRapports: async (req, res) => {
+  let rapports = await Rapport.find(req.query).populate("user");
+  
+  res.status(200).json({rapport : rapports}) 
+
 },
 
 }

@@ -36,7 +36,8 @@ function updateToken(user){
         adresse: user.adresse,
         tel: user.tel,
         imageProfile: user.imageProfile,
-        service: user.service
+        service: user.service,
+        poste: user.poste
     }
     return {token: token, response: response}
 };
@@ -253,6 +254,14 @@ module.exports = {
             await newRapp.save();
             user.rapport.push(newRapp);
             await user.save();
+            const notifAdmin = new Notification({
+                user: user,
+                status: "not seen",
+                type: "accident",
+                role: "admin",
+                rapport: newRapp
+              })
+            notifAdmin.save();
             let rapp = await Rapport.find({}).populate('Employee');
 
             res.send(rapp)
@@ -306,8 +315,7 @@ module.exports = {
     },
     GetNotifications: async(req, res) => {
         const user = await User.findById(req.query.id);
-        const notifs = await Notification.find({user: user, status: "not seen", role: "user"})
-        console.log(notifs)
+        const notifs = await Notification.find({user: user, status: "not seen", role: "user"}).populate("promotion").populate("sanction")
         res.status(200).send({notifs: notifs})
     },
 
@@ -416,7 +424,7 @@ module.exports = {
                 user: user,
                 status: "not seen",
                 type: "demande",
-                role: "user",
+                role: "admin",
                 demande: newReq
               })
               notif.save();
@@ -450,5 +458,14 @@ module.exports = {
         )
         res.status(200).send(result);
       },
+      markAsSeen: async(req, res) => {
+          try{
+              await Notification.findByIdAndUpdate(req.query.id, {status: "seen"})
+              res.status(200).send({success: "true"});
+          }
+          catch(e){
+            res.status(500).send({success: "false"});
+          }
+      }
 
 }
