@@ -1,8 +1,9 @@
 var mongoose = require('mongoose')
 var Schema = mongoose.Schema;
 
-var mutualPaper = new mongoose.Schema({
-    state: { type: String, required: true },
+var mutual = new mongoose.Schema({
+    status: { type: String, },
+    numPaper: {type: String,},
     
 
     user: {
@@ -11,5 +12,5 @@ var mutualPaper = new mongoose.Schema({
     },
 
 });
-var mutual = mongoose.model('mutual', mutualPaper);
+var mutual = mongoose.model('mutual', mutual);
 module.exports = mutual;

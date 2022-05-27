@@ -25,6 +25,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/requestrapport").post(UserServices.requestRapport);
   app.route("/getpointage").get(UserServices.getPointage)
 
+  app.route("/UpdateCertificat").post(UserServices.updateCertificat);
 
   app.route("/getmutation").get(UserServices.GetMutationById);
 
@@ -36,6 +37,9 @@ module.exports = (app, apiRoutes) => {
   app.route("/getNotifications").get(UserServices.GetNotifications);
   app.route("/deletereqhours").delete(UserServices.deleteReqHours);
   app.route("/getreqhours").get(UserServices.GetReqHoursById);
+
+  app.route("/getmutuals").get(UserServices.GetMutualById);
+
 
 
 
@@ -54,7 +58,7 @@ module.exports = (app, apiRoutes) => {
   app.route("/updatemission/:id").put(adminService.updateMission);
   app.route("/deletesmission/:id").delete(adminService.deleteMission);
 
-  app.route("/createMutualPaper").post(adminService.createMission);
+  app.route("/createmutualpaper").post(adminService.createMutualPaper);
   app.route("/updateMutualPaper/:id").put(adminService.updateMission);
   app.route("/deletesMutualPaper/:id").delete(adminService.deleteMission);
 

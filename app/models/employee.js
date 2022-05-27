@@ -20,6 +20,7 @@ var employeeSchema = new mongoose.Schema({
   accountStatus:{type: String, required: true},
   imageProfile:{type : String},
 
+
   leaveApplication: [{ type: Schema.Types.ObjectId, ref: "LeaveApplication" }],
   sanction: [{ type: Schema.Types.ObjectId, ref: "sanction" }],
   promotion: [{ type: Schema.Types.ObjectId, ref: "promotion" }],

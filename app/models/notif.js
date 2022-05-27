@@ -18,7 +18,7 @@ var notificationSchema = new mongoose.Schema({
   rapport: [{ type: Schema.Types.ObjectId, ref: "rapport" }],
   Mutation: [{ type: Schema.Types.ObjectId, ref: "Mutation" }],
   demande: [{ type: Schema.Types.ObjectId, ref: "Demande" }],
-
+  mutual:[{ type: Schema.Types.ObjectId, ref: "mutual" }],
   user: {
     type: Schema.Types.ObjectId,
     ref: "Employee",

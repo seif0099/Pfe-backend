@@ -7,7 +7,7 @@ var ObjectId = require("mongoose").mongo.ObjectID;
 var sanction = require("../models/sanctions");
 const promotion = require("../models/promotion");
 const mission = require("../models/mission");
-const mutual = require("../models/mutualPaper");
+const mutualPaper = require("../models/mutualPaper");
 const Pointage = require("../models/pointage");
 const SuppHours = require("../models/suppHours");
 const Mutation = require("../models/mutation");
@@ -232,17 +232,24 @@ module.exports = {
   },
   createMutualPaper: async (req, res) => {
     try {
-      const newPaper = new mutual(req.body);
-      console.log(req.body);
-      const user = await User.findById(req.body.userid);
-      console.log(user);
-      newPaper.user = user;
-      await newPaper.save();
-      user.mutual.push(newPaper);
+      let data = req.body
+      data.status = req.body.status
+      const newMutual = new mutualPaper(data);
+      const user = await User.findById(req.query.id);
+      newMutual.user = user;
+      await newMutual.save();
+      user.mutualPaper.push(newMutual);
       await user.save();
-      let papers = await mutual.find({}).populate("Employee");
-
-      res.send(papers);
+      let mutualPapers = await mutualPaper.find({}).populate("Employee");
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "mission",
+        role: "user",
+        mutualPaper: newMutual
+      })
+      notif.save();
+      res.status(200).send(mutualPapers);
     } catch (error) {
       console.log(error);
       res.send("err");

@@ -10,6 +10,8 @@ const Pointage = require("../models/pointage");
 const Notification = require("../models/notif");
 const Mutation = require("../models/mutation");
 const Demande = require("../models/demande");
+const mutualPaper = require("../models/mutualPaper");
+
 var ObjectId = require('mongoose').mongo.ObjectID;
 
 /* costum methods  */
@@ -165,6 +167,38 @@ module.exports = {
 
     },
 
+    updateCertificat: async (req, res) => {
+        const SECRET= "securep4ssword"
+        const path = require("path");
+        const multer = require("multer");
+        
+
+        const storage = multer.diskStorage({
+        destination: "./public/uploads/",
+        filename: function(req, file, cb){
+            cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
+        }
+        });
+
+        const upload =  multer({
+        storage: storage,
+        limits:{fileSize: 1000000},
+        }).single("myImage");
+        upload(req, res, async function(){
+            let filename = req.file.filename;
+            const result = await LeaveApplication.findByIdAndUpdate(req.query.id,{certificat : filename});
+            let user = await User.findById(req.query.id);
+            let response = updateToken(user)
+            res.status(200).json({
+                success: true,
+                idToken: response.token,
+                expiresIn: 1440,
+                user: response.response,
+            });
+        });
+        
+
+    },
 
     deleteUser: async(req, res) => {
 
@@ -464,6 +498,23 @@ module.exports = {
           catch(e){
             res.status(500).send({success: "false"});
           }
+      },
+      GetMutualById:async (req, res) => {
+        console.log(req.query.id)
+        const user = await User.findById(req.query.id);
+        const leaves = await mutualPaper.find({user: user})
+        const result = []
+        leaves.map(
+            row => {
+                let newRow = {}
+                newRow._id = row._id
+                newRow.status = row.status
+                newRow.numPaper = row.numPaper
+              
+                result.push(newRow)
+            }
+        )
+        res.status(200).send(result);
       }
 
 }

@@ -5,6 +5,8 @@ var leaveApplicationSchema = new mongoose.Schema({
   toDate: { type: Date, required: true },
   reasonForLeave: { type: String,  },
   status: { type: String,  },
+  certificat:{type : String},
+
   user: {
     type: Schema.Types.ObjectId,
     ref: "Employee",
