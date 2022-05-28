@@ -24,63 +24,60 @@ var Encrypt = function (string) {
   var encrypted = hash.hex();
   return encrypted;
 };
-function updateToken(user){
+function updateToken(user) {
   const payload = {
-      user: user.user,
+    user: user.user,
   };
-  var token = jwt.sign(payload, 'kjhkhkjh', {
-      expiresIn: "2 days",
+  var token = jwt.sign(payload, "kjhkhkjh", {
+    expiresIn: "2 days",
   });
   let response = {
-      _id: user._id,
-      nom: user.nom,
-      prenom: user.prenom,
-      email: user.email,
-      username: user.username,
-      imageProfile: user.imageProfile,
-  }
-  return {token: token, response: response}
-};
+    _id: user._id,
+    nom: user.nom,
+    prenom: user.prenom,
+    email: user.email,
+    username: user.username,
+    imageProfile: user.imageProfile,
+  };
+  return { token: token, response: response };
+}
 module.exports = {
-  Authenticate: async(req, res) => {
+  Authenticate: async (req, res) => {
     let user = await admin.findOne({ email: req.body.email });
-       
-    if (!user) {
-        res.json({
-            success: false,
-            message: "Authentication failed. email not found.",
-        });
-    } else {
-        if (Encrypt(req.body.password) != user.password) {
-            res.json({
-                success: false,
-                message: "Authentication failed. Wrong password.",
-            });
-        } else {
-            
-            let response = updateToken(user)
 
-              // return the information including token as JSON
-              res.json({
-                  success: true,
-                  message: "Enjoy your token!",
-                  idToken: response.token,
-                  expiresIn: 1440,
-                  user: response.response,
-              });
-            
-        }
+    if (!user) {
+      res.json({
+        success: false,
+        message: "Authentication failed. email not found.",
+      });
+    } else {
+      if (Encrypt(req.body.password) != user.password) {
+        res.json({
+          success: false,
+          message: "Authentication failed. Wrong password.",
+        });
+      } else {
+        let response = updateToken(user);
+
+        // return the information including token as JSON
+        res.json({
+          success: true,
+          message: "Enjoy your token!",
+          idToken: response.token,
+          expiresIn: 1440,
+          user: response.response,
+        });
+      }
     }
-},
+  },
   deleteUser: async (req, res) => {
     try {
-      console.log(req)
-      const user = await User.findOneAndUpdate(req.query._id, {accountStatus: "disabled"})
+      console.log(req);
+      const user = await User.findOneAndUpdate(req.query._id, { accountStatus: "disabled" });
       return res.status(200).send();
     } catch (error) {
       res.status(500).send({ error });
     }
-    
   },
 
   addSanction: async (req, res) => {
@@ -98,8 +95,8 @@ module.exports = {
         status: "not seen",
         type: "sanction",
         role: "user",
-        sanction: newSanction
-      })
+        sanction: newSanction,
+      });
       notif.save();
       let sanctions = await sanction.find({}).populate("Employee");
 
@@ -143,15 +140,14 @@ module.exports = {
   GetAllUsers: async (req, res) => {
     User.find({}, function (err, users) {
       res.json(users);
-      console.log(users)
+      console.log(users);
     });
   },
   GetUserById: async (req, res) => {
-    const user = await User.findOne({_id: req.query.id})
-    console.log(user)
-    res.status(200).json(user)
+    const user = await User.findOne({ _id: req.query.id });
+    console.log(user);
+    res.status(200).json(user);
   },
-
 
   createPromotion: async (req, res) => {
     try {
@@ -162,19 +158,19 @@ module.exports = {
       newProm.user = user;
       await newProm.save();
       user.promotion.push(newProm);
-      user.poste = req.body.newPoste
+      user.poste = req.body.newPoste;
       await user.save();
       const notif = new Notification({
         user: user,
         status: "not seen",
         type: "promotion",
         role: "user",
-        promotion: newProm
-      })
+        promotion: newProm,
+      });
       notif.save();
       let proms = await promotion.find({}).populate("Employee");
 
-      res.status(200).json({message: "Promotion crée avec succés"})
+      res.status(200).json({ message: "Promotion crée avec succés" });
     } catch (error) {
       console.log(error);
       res.send("err");
@@ -183,8 +179,8 @@ module.exports = {
 
   createMission: async (req, res) => {
     try {
-      let data = req.body
-      data.status = "en cours"
+      let data = req.body;
+      data.status = "en cours";
       const newMission = new mission(data);
       const user = await User.findById(req.query.id);
       newMission.user = user;
@@ -197,8 +193,8 @@ module.exports = {
         status: "not seen",
         type: "mission",
         role: "user",
-        mission: newMission
-      })
+        mission: newMission,
+      });
       notif.save();
       res.status(200).send(missions);
     } catch (error) {
@@ -232,8 +228,8 @@ module.exports = {
   },
   createMutualPaper: async (req, res) => {
     try {
-      let data = req.body
-      data.status = req.body.status
+      let data = req.body;
+      data.status = req.body.status;
       const newMutual = new mutualPaper(data);
       const user = await User.findById(req.query.id);
       newMutual.user = user;
@@ -246,8 +242,8 @@ module.exports = {
         status: "not seen",
         type: "mission",
         role: "user",
-        mutualPaper: newMutual
-      })
+        mutualPaper: newMutual,
+      });
       notif.save();
       res.status(200).send(mutualPapers);
     } catch (error) {
@@ -279,9 +275,9 @@ module.exports = {
       res.status(500).send({ error });
     }
   },
-  InsertPointage: async(req,res) =>{
+  InsertPointage: async (req, res) => {
     try {
-      console.log("insertion")
+      console.log("insertion");
       const newPointage = new Pointage(req.body);
       console.log(req.body);
       const user = await User.findById(req.body.userid);
@@ -303,244 +299,230 @@ module.exports = {
     res.status(200).json({ success: true });
   },
   GetAllRequests: async (req, res) => {
-    let result = []
-    let requests = await LeaveApplication.find({status : "pending"}).populate("user");
-    requests.map(row => {
-      let newElement = {}
-      newElement._id = row._id
-      newElement.fromDate = row.fromDate
-      newElement.toDate = row.toDate
-      newElement.reasonForLeave = row.reasonForLeave
-      newElement.nom = row.user.nom
-      newElement.prenom = row.user.prenom
-      result.push(newElement)
-    })
-    res.status(200).json(result)
+    let result = [];
+    let requests = await LeaveApplication.find({ status: "pending" }).populate("user");
+    requests.map((row) => {
+      let newElement = {};
+      newElement._id = row._id;
+      newElement.fromDate = row.fromDate;
+      newElement.toDate = row.toDate;
+      newElement.reasonForLeave = row.reasonForLeave;
+      newElement.nom = row.user.nom;
+      newElement.prenom = row.user.prenom;
+      result.push(newElement);
+    });
+    res.status(200).json(result);
   },
-  updateLeaveRefused: async(req, res) => {
-    const leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Refused"});
+  updateLeaveRefused: async (req, res) => {
+    const leave = await LeaveApplication.findByIdAndUpdate(req.query.id, { status: "Refused" });
     const user = await User.findById(leave.user._id);
 
-    let leaveId = await LeaveApplication.findById(req.query.id)
-    await Notification.findOneAndDelete({leaveApplication: leaveId, role: "admin"})
+    let leaveId = await LeaveApplication.findById(req.query.id);
+    await Notification.findOneAndDelete({ leaveApplication: leaveId, role: "admin" });
     const notif = new Notification({
       user: user,
       status: "not seen",
       type: "leave",
       role: "user",
-      leaveApplication: leave
-    })
+      leaveApplication: leave,
+    });
     notif.save();
     res.status(200).json({ success: true });
-},
-updateLeaveAccepted: async(req, res) => {
-  let leave = await LeaveApplication.findByIdAndUpdate(req.query.id, {status : "Accepted"});
-  const user = await User.findById(leave.user._id);
-  let leaveId = await LeaveApplication.findById(req.query.id)
-  await Notification.findOneAndDelete({leaveApplication: leaveId, role: "admin"})
-  const notif = new Notification({
-    user: user,
-    status: "not seen",
-    type: "leave",
-    role: "user",
-    leaveApplication: leave
-  })
-  res.status(200).json({ success: true });
-},
-getAllHours: async (req, res) => {
-  let result = []
-  let suppHours = await SuppHours.find({status : "pending"}).populate("user");
-  suppHours.map(row => {
-    let newElement = {}
-    newElement._id = row._id
-    newElement.typeOfWork = row.typeOfWork
-    newElement.fromDate = row.fromDate
-    newElement.toDate = row.toDate
-    newElement.nom = row.user.nom
-    newElement.prenom = row.user.prenom
-    result.push(newElement)
-  })
-  res.status(200).json(result)
-
-},
-updateHoursRefused: async(req, res) => {
-  await SuppHours.findByIdAndUpdate(req.query.id, {status : "Refused"});
-  let supphours = await SuppHours.findById(req.query.id)
-  let user = await User.findById(supphours.user)
-  let suppId = await SuppHours.findById(req.query.id)
-  await Notification.findOneAndDelete({SuppHours: suppId, role: "admin"})
-  const notif = new Notification({
-    user: user,
-    status: "not seen",
-    type: "supphours",
-    role: "user",
-    SuppHours: supphours
-  })
-  notif.save();
-  res.status(200).json({ success: true });
-},
-updateHoursAccepted: async(req, res) => {
-await SuppHours.findByIdAndUpdate(req.query.id, {status : "Accepted"});
-let supphours = await SuppHours.findById(req.query.id)
-  let user = await User.findById(supphours.user)
-  let suppId = await SuppHours.findById(req.query.id)
-  await Notification.findOneAndDelete({SuppHours: suppId, role: "admin"})
-  const notif = new Notification({
-    user: user,
-    status: "not seen",
-    type: "supphours",
-    role: "user",
-    SuppHours: supphours
-  })
-  notif.save();
-res.status(200).json({ success: true });
-},
-
-
-
-createMutation: async (req, res) => {
-  try {
-    console.log(req.body.userid)
-    const user = await User.findById(req.body.userid);
-    let data = req.body
-    data.from = user.service
-    data.status = "pending"
-    console.log(data)
-    const newMut = new Mutation(data);
-    newMut.user = user;
-    await newMut.save();
-    user.Mutation.push(newMut);
-    await user.save();
+  },
+  updateLeaveAccepted: async (req, res) => {
+    let leave = await LeaveApplication.findByIdAndUpdate(req.query.id, { status: "Accepted" });
+    const user = await User.findById(leave.user._id);
+    let leaveId = await LeaveApplication.findById(req.query.id);
+    await Notification.findOneAndDelete({ leaveApplication: leaveId, role: "admin" });
     const notif = new Notification({
       user: user,
       status: "not seen",
-      type: "mutation",
-      role: "admin",
-      Mutation: newMut
-    })
-    notif.save();
-    res.status(200).json({ success: "true" });
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ success: "false" });
-  }
-},
-getMutations: async(req, res) => {
-  let result = await Mutation.find({status: "pending"}).populate("user")
-  console.log(result)
-  res.status(200).send({result: result})
-},
-getAllMissions: async(req, res) => {
-  try {
-      let missions = await mission.find().populate("user");
-      console.log(missions)
-      res.status(200).json(missions)
-  }
-  catch(e){
-    res.status(500).send({success: "false"})
-  }
-},
-updateMutation: async(req, res) => {
-  try{
-    console.log(req.query)
-    await Mutation.findByIdAndUpdate(req.query.id, {status: req.query.status});
-    let mutation = await Mutation.findById(req.query.id);
-    let mutationId = await Mutation.findById(req.query.id)
-    await Notification.findOneAndDelete({Mutation: mutationId, role: "admin"})
-    let user = await User.findById(mutation.user)
-    const notif = new Notification({
-      user: user,
-      status: "not seen",
-      type: "mutation",
+      type: "leave",
       role: "user",
-      Mutation: mutation
-    })
+      leaveApplication: leave,
+    });
+    res.status(200).json({ success: true });
+  },
+  getAllHours: async (req, res) => {
+    let result = [];
+    let suppHours = await SuppHours.find({ status: "pending" }).populate("user");
+    suppHours.map((row) => {
+      let newElement = {};
+      newElement._id = row._id;
+      newElement.typeOfWork = row.typeOfWork;
+      newElement.fromDate = row.fromDate;
+      newElement.toDate = row.toDate;
+      newElement.nom = row.user.nom;
+      newElement.prenom = row.user.prenom;
+      result.push(newElement);
+    });
+    res.status(200).json(result);
+  },
+  updateHoursRefused: async (req, res) => {
+    await SuppHours.findByIdAndUpdate(req.query.id, { status: "Refused" });
+    let supphours = await SuppHours.findById(req.query.id);
+    let user = await User.findById(supphours.user);
+    let suppId = await SuppHours.findById(req.query.id);
+    await Notification.findOneAndDelete({ SuppHours: suppId, role: "admin" });
+    const notif = new Notification({
+      user: user,
+      status: "not seen",
+      type: "supphours",
+      role: "user",
+      SuppHours: supphours,
+    });
     notif.save();
+    res.status(200).json({ success: true });
+  },
+  updateHoursAccepted: async (req, res) => {
+    await SuppHours.findByIdAndUpdate(req.query.id, { status: "Accepted" });
+    let supphours = await SuppHours.findById(req.query.id);
+    let user = await User.findById(supphours.user);
+    let suppId = await SuppHours.findById(req.query.id);
+    await Notification.findOneAndDelete({ SuppHours: suppId, role: "admin" });
+    const notif = new Notification({
+      user: user,
+      status: "not seen",
+      type: "supphours",
+      role: "user",
+      SuppHours: supphours,
+    });
+    notif.save();
+    res.status(200).json({ success: true });
+  },
 
-    res.status(200).send({success: "true"})
-
-  }
-  catch(e){
-    console.log(e)
-    res.status(500).send({success: "false"})
-  }
-},
-getAdminNotifications: async(req, res) => {
-  try{
-    let notifs = await Notification.find({role: "admin", status: "not seen"})
-    res.status(200).send({notifs: notifs})
-  }
-  catch(e){
-    console.log(e)
-    res.status(500).send({success: "false"})
-  }
-},
-getDemandesAdministrative: async(req, res) => {
-  try{
-    let demandes = await Demande.find().populate("user")
-    res.status(200).send({demandes: demandes})
-  }
-  catch(e){
-    console.log(e)
-    res.status(500).send({success: "false"})
-  }
-},
-updateProfilePic: async (req, res) => {
-  const SECRET= "securep4ssword"
-  const path = require("path");
-  const multer = require("multer");
-  
-
-  const storage = multer.diskStorage({
-  destination: "./public/uploads/",
-  filename: function(req, file, cb){
-      cb(null,"IMAGE-" + Date.now() + path.extname(file.originalname));
-  }
-  });
-
-  const upload =  multer({
-  storage: storage,
-  limits:{fileSize: 1000000},
-  }).single("myImage");
-  upload(req, res, async function(){
-      let filename = req.file.filename;
-      const result = await admin.findByIdAndUpdate(req.query.id,{imageProfile : filename});
-      let user = await admin.findById(req.query.id);
-      let response = updateToken(user)
-      res.status(200).json({
-          success: true,
-          idToken: response.token,
-          expiresIn: 1440,
-          user: response.response,
+  createMutation: async (req, res) => {
+    try {
+      console.log(req.body.userid);
+      const user = await User.findById(req.body.userid);
+      let data = req.body;
+      data.from = user.service;
+      data.status = "pending";
+      console.log(data);
+      const newMut = new Mutation(data);
+      newMut.user = user;
+      await newMut.save();
+      user.Mutation.push(newMut);
+      await user.save();
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "mutation",
+        role: "admin",
+        Mutation: newMut,
       });
-  });
-  
+      notif.save();
+      res.status(200).json({ success: "true" });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ success: "false" });
+    }
+  },
+  getMutations: async (req, res) => {
+    let result = await Mutation.find({ status: "pending" }).populate("user");
+    console.log(result);
+    res.status(200).send({ result: result });
+  },
+  getAllMissions: async (req, res) => {
+    try {
+      let missions = await mission.find().populate("user");
+      console.log(missions);
+      res.status(200).json(missions);
+    } catch (e) {
+      res.status(500).send({ success: "false" });
+    }
+  },
+  updateMutation: async (req, res) => {
+    try {
+      console.log(req.query);
+      await Mutation.findByIdAndUpdate(req.query.id, { status: req.query.status });
+      let mutation = await Mutation.findById(req.query.id);
+      let mutationId = await Mutation.findById(req.query.id);
+      await Notification.findOneAndDelete({ Mutation: mutationId, role: "admin" });
+      let user = await User.findById(mutation.user);
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "mutation",
+        role: "user",
+        Mutation: mutation,
+      });
+      notif.save();
 
-},
-updateAdmin: async(req, res) => {
-  const SECRET= "securep4ssword"
-  let data = req.body
-  if(data.password!=""){
-      data.password = Encrypt(data.password)
-  }
-  Object.keys(data).forEach((k) => data[k] == '' && delete data[k]);
-  await admin.findByIdAndUpdate(req.body.userid, data);
-  let user = await admin.findById(req.body.userid);
-  let response = updateToken(user)
-  res.status(200).json({
+      res.status(200).send({ success: "true" });
+    } catch (e) {
+      console.log(e);
+      res.status(500).send({ success: "false" });
+    }
+  },
+  getAdminNotifications: async (req, res) => {
+    try {
+      let notifs = await Notification.find({ role: "admin", status: "not seen" });
+      res.status(200).send({ notifs: notifs });
+    } catch (e) {
+      console.log(e);
+      res.status(500).send({ success: "false" });
+    }
+  },
+  getDemandesAdministrative: async (req, res) => {
+    try {
+      let demandes = await Demande.find().populate("user");
+      res.status(200).send({ demandes: demandes });
+    } catch (e) {
+      console.log(e);
+      res.status(500).send({ success: "false" });
+    }
+  },
+  updateProfilePic: async (req, res) => {
+    const SECRET = "securep4ssword";
+    const path = require("path");
+    const multer = require("multer");
+
+    const storage = multer.diskStorage({
+      destination: "./public/uploads/",
+      filename: function (req, file, cb) {
+        cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+      },
+    });
+
+    const upload = multer({
+      storage: storage,
+      limits: { fileSize: 1000000 },
+    }).single("myImage");
+    upload(req, res, async function () {
+      let filename = req.file.filename;
+      const result = await admin.findByIdAndUpdate(req.query.id, { imageProfile: filename });
+      let user = await admin.findById(req.query.id);
+      let response = updateToken(user);
+      res.status(200).json({
+        success: true,
+        idToken: response.token,
+        expiresIn: 1440,
+        user: response.response,
+      });
+    });
+  },
+  updateAdmin: async (req, res) => {
+    const SECRET = "securep4ssword";
+    let data = req.body;
+    if (data.password != "") {
+      data.password = Encrypt(data.password);
+    }
+    Object.keys(data).forEach((k) => data[k] == "" && delete data[k]);
+    await admin.findByIdAndUpdate(req.body.userid, data);
+    let user = await admin.findById(req.body.userid);
+    let response = updateToken(user);
+    res.status(200).json({
       success: true,
       idToken: response.token,
       expiresIn: 1440,
       user: response.response,
-  });
-},
+    });
+  },
 
-getAllRapports: async (req, res) => {
-  let rapports = await Rapport.find(req.query).populate("user");
-  
-  res.status(200).json({rapport : rapports}) 
+  getAllRapports: async (req, res) => {
+    let rapports = await Rapport.find(req.query).populate("user");
 
-},
-
-}
-
+    res.status(200).json({ rapport: rapports });
+  },
+};
