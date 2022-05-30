@@ -17,6 +17,12 @@ const express = require("express");
 const Notification = require("../models/notif");
 const Demande = require("../models/demande");
 const Rapport = require("../models/rapport");
+allUsers = function () {
+  User.find({}, function (err, users) {
+    res.json(users);
+    console.log(users);
+  });
+};
 
 var Encrypt = function (string) {
   var hash = sha512.create();
@@ -43,7 +49,9 @@ function updateToken(user) {
 }
 module.exports = {
   Authenticate: async (req, res) => {
-    let user = await admin.findOne({ email: req.body.email });
+    let user = await admin.findOne({
+      email: req.body.email,
+    });
 
     if (!user) {
       res.json({
@@ -73,7 +81,10 @@ module.exports = {
   deleteUser: async (req, res) => {
     try {
       console.log(req);
-      const user = await User.findOneAndUpdate(req.query._id, { accountStatus: "disabled" });
+      const user = await User.findOneAndUpdate(
+        req.query._id,
+        { accountStatus: "disabled" }
+      );
       return res.status(200).send();
     } catch (error) {
       res.status(500).send({ error });
@@ -98,7 +109,9 @@ module.exports = {
         sanction: newSanction,
       });
       notif.save();
-      let sanctions = await sanction.find({}).populate("Employee");
+      let sanctions = await sanction
+        .find({})
+        .populate("Employee");
 
       res.send(sanctions);
     } catch (error) {
@@ -109,7 +122,9 @@ module.exports = {
 
   deleteSanction: async (req, res) => {
     try {
-      const result = await sanction.findOneAndDelete({ _id: req.params.id });
+      const result = await sanction.findOneAndDelete({
+        _id: req.params.id,
+      });
       if (result) {
         const sanctionDelted = await User.updateOne(
           { _id: result.user },
@@ -127,7 +142,10 @@ module.exports = {
   },
 
   updateSanction: async (req, res) => {
-    await sanction.findByIdAndUpdate(req.params.id, req.body);
+    await sanction.findByIdAndUpdate(
+      req.params.id,
+      req.body
+    );
 
     res.status(200).json({ success: true });
   },
@@ -136,13 +154,19 @@ module.exports = {
       res.json(users);
     });
   },
-
   GetAllUsers: async (req, res) => {
     User.find({}, function (err, users) {
       res.json(users);
       console.log(users);
     });
   },
+  getPointage: async (req, res) => {
+    let p = Pointage.find({}, function (err, users) {
+      console.log(p);
+      res.json(users);
+    });
+  },
+
   GetUserById: async (req, res) => {
     const user = await User.findOne({ _id: req.query.id });
     console.log(user);
@@ -168,9 +192,13 @@ module.exports = {
         promotion: newProm,
       });
       notif.save();
-      let proms = await promotion.find({}).populate("Employee");
+      let proms = await promotion
+        .find({})
+        .populate("Employee");
 
-      res.status(200).json({ message: "Promotion crée avec succés" });
+      res
+        .status(200)
+        .json({ message: "Promotion crée avec succés" });
     } catch (error) {
       console.log(error);
       res.send("err");
@@ -187,7 +215,9 @@ module.exports = {
       await newMission.save();
       user.mission.push(newMission);
       await user.save();
-      let missions = await mission.find({}).populate("Employee");
+      let missions = await mission
+        .find({})
+        .populate("Employee");
       const notif = new Notification({
         user: user,
         status: "not seen",
@@ -203,14 +233,19 @@ module.exports = {
     }
   },
   updateMission: async (req, res) => {
-    await mission.findByIdAndUpdate(req.params.id, req.body);
+    await mission.findByIdAndUpdate(
+      req.params.id,
+      req.body
+    );
 
     res.status(200).json({ success: true });
   },
 
   deleteMission: async (req, res) => {
     try {
-      const result = await mission.findOneAndDelete({ _id: req.params.id });
+      const result = await mission.findOneAndDelete({
+        _id: req.params.id,
+      });
       if (result) {
         const userUpdated = await User.updateOne(
           { _id: result.user },
@@ -236,7 +271,9 @@ module.exports = {
       await newMutual.save();
       user.mutualPaper.push(newMutual);
       await user.save();
-      let mutualPapers = await mutualPaper.find({}).populate("Employee");
+      let mutualPapers = await mutualPaper
+        .find({})
+        .populate("Employee");
       const notif = new Notification({
         user: user,
         status: "not seen",
@@ -259,7 +296,9 @@ module.exports = {
 
   deleteMutualPaper: async (req, res) => {
     try {
-      const result = await mutual.findOneAndDelete({ _id: req.params.id });
+      const result = await mutual.findOneAndDelete({
+        _id: req.params.id,
+      });
       if (result) {
         const userUpdated = await User.updateOne(
           { _id: result.user },
@@ -281,8 +320,9 @@ module.exports = {
       const newPointage = new Pointage(req.body);
       console.log(req.body);
       const user = await User.findById(req.body.userid);
-      console.log(user);
+      user.state = "true";
       newPointage.user = user;
+      console.log(user, "aaaaaaaaaaa");
       await newPointage.save();
       user.Pointage.push(newPointage);
       await user.save();
@@ -300,7 +340,9 @@ module.exports = {
   },
   GetAllRequests: async (req, res) => {
     let result = [];
-    let requests = await LeaveApplication.find({ status: "pending" }).populate("user");
+    let requests = await LeaveApplication.find({
+      status: "pending",
+    }).populate("user");
     requests.map((row) => {
       let newElement = {};
       newElement._id = row._id;
@@ -314,11 +356,19 @@ module.exports = {
     res.status(200).json(result);
   },
   updateLeaveRefused: async (req, res) => {
-    const leave = await LeaveApplication.findByIdAndUpdate(req.query.id, { status: "Refused" });
+    const leave = await LeaveApplication.findByIdAndUpdate(
+      req.query.id,
+      { status: "Refused" }
+    );
     const user = await User.findById(leave.user._id);
 
-    let leaveId = await LeaveApplication.findById(req.query.id);
-    await Notification.findOneAndDelete({ leaveApplication: leaveId, role: "admin" });
+    let leaveId = await LeaveApplication.findById(
+      req.query.id
+    );
+    await Notification.findOneAndDelete({
+      leaveApplication: leaveId,
+      role: "admin",
+    });
     const notif = new Notification({
       user: user,
       status: "not seen",
@@ -330,10 +380,18 @@ module.exports = {
     res.status(200).json({ success: true });
   },
   updateLeaveAccepted: async (req, res) => {
-    let leave = await LeaveApplication.findByIdAndUpdate(req.query.id, { status: "Accepted" });
+    let leave = await LeaveApplication.findByIdAndUpdate(
+      req.query.id,
+      { status: "Accepted" }
+    );
     const user = await User.findById(leave.user._id);
-    let leaveId = await LeaveApplication.findById(req.query.id);
-    await Notification.findOneAndDelete({ leaveApplication: leaveId, role: "admin" });
+    let leaveId = await LeaveApplication.findById(
+      req.query.id
+    );
+    await Notification.findOneAndDelete({
+      leaveApplication: leaveId,
+      role: "admin",
+    });
     const notif = new Notification({
       user: user,
       status: "not seen",
@@ -345,7 +403,9 @@ module.exports = {
   },
   getAllHours: async (req, res) => {
     let result = [];
-    let suppHours = await SuppHours.find({ status: "pending" }).populate("user");
+    let suppHours = await SuppHours.find({
+      status: "pending",
+    }).populate("user");
     suppHours.map((row) => {
       let newElement = {};
       newElement._id = row._id;
@@ -359,11 +419,16 @@ module.exports = {
     res.status(200).json(result);
   },
   updateHoursRefused: async (req, res) => {
-    await SuppHours.findByIdAndUpdate(req.query.id, { status: "Refused" });
+    await SuppHours.findByIdAndUpdate(req.query.id, {
+      status: "Refused",
+    });
     let supphours = await SuppHours.findById(req.query.id);
     let user = await User.findById(supphours.user);
     let suppId = await SuppHours.findById(req.query.id);
-    await Notification.findOneAndDelete({ SuppHours: suppId, role: "admin" });
+    await Notification.findOneAndDelete({
+      SuppHours: suppId,
+      role: "admin",
+    });
     const notif = new Notification({
       user: user,
       status: "not seen",
@@ -375,11 +440,16 @@ module.exports = {
     res.status(200).json({ success: true });
   },
   updateHoursAccepted: async (req, res) => {
-    await SuppHours.findByIdAndUpdate(req.query.id, { status: "Accepted" });
+    await SuppHours.findByIdAndUpdate(req.query.id, {
+      status: "Accepted",
+    });
     let supphours = await SuppHours.findById(req.query.id);
     let user = await User.findById(supphours.user);
     let suppId = await SuppHours.findById(req.query.id);
-    await Notification.findOneAndDelete({ SuppHours: suppId, role: "admin" });
+    await Notification.findOneAndDelete({
+      SuppHours: suppId,
+      role: "admin",
+    });
     const notif = new Notification({
       user: user,
       status: "not seen",
@@ -419,7 +489,9 @@ module.exports = {
     }
   },
   getMutations: async (req, res) => {
-    let result = await Mutation.find({ status: "pending" }).populate("user");
+    let result = await Mutation.find({
+      status: "pending",
+    }).populate("user");
     console.log(result);
     res.status(200).send({ result: result });
   },
@@ -435,10 +507,17 @@ module.exports = {
   updateMutation: async (req, res) => {
     try {
       console.log(req.query);
-      await Mutation.findByIdAndUpdate(req.query.id, { status: req.query.status });
+      await Mutation.findByIdAndUpdate(req.query.id, {
+        status: req.query.status,
+      });
       let mutation = await Mutation.findById(req.query.id);
-      let mutationId = await Mutation.findById(req.query.id);
-      await Notification.findOneAndDelete({ Mutation: mutationId, role: "admin" });
+      let mutationId = await Mutation.findById(
+        req.query.id
+      );
+      await Notification.findOneAndDelete({
+        Mutation: mutationId,
+        role: "admin",
+      });
       let user = await User.findById(mutation.user);
       const notif = new Notification({
         user: user,
@@ -457,7 +536,10 @@ module.exports = {
   },
   getAdminNotifications: async (req, res) => {
     try {
-      let notifs = await Notification.find({ role: "admin", status: "not seen" });
+      let notifs = await Notification.find({
+        role: "admin",
+        status: "not seen",
+      });
       res.status(200).send({ notifs: notifs });
     } catch (e) {
       console.log(e);
@@ -481,7 +563,12 @@ module.exports = {
     const storage = multer.diskStorage({
       destination: "./public/uploads/",
       filename: function (req, file, cb) {
-        cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+        cb(
+          null,
+          "IMAGE-" +
+            Date.now() +
+            path.extname(file.originalname)
+        );
       },
     });
 
@@ -491,7 +578,10 @@ module.exports = {
     }).single("myImage");
     upload(req, res, async function () {
       let filename = req.file.filename;
-      const result = await admin.findByIdAndUpdate(req.query.id, { imageProfile: filename });
+      const result = await admin.findByIdAndUpdate(
+        req.query.id,
+        { imageProfile: filename }
+      );
       let user = await admin.findById(req.query.id);
       let response = updateToken(user);
       res.status(200).json({
@@ -508,7 +598,9 @@ module.exports = {
     if (data.password != "") {
       data.password = Encrypt(data.password);
     }
-    Object.keys(data).forEach((k) => data[k] == "" && delete data[k]);
+    Object.keys(data).forEach(
+      (k) => data[k] == "" && delete data[k]
+    );
     await admin.findByIdAndUpdate(req.body.userid, data);
     let user = await admin.findById(req.body.userid);
     let response = updateToken(user);
@@ -521,7 +613,9 @@ module.exports = {
   },
 
   getAllRapports: async (req, res) => {
-    let rapports = await Rapport.find(req.query).populate("user");
+    let rapports = await Rapport.find(req.query).populate(
+      "user"
+    );
 
     res.status(200).json({ rapport: rapports });
   },

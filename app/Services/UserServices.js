@@ -45,7 +45,9 @@ function updateToken(user) {
 }
 module.exports = {
   SignIn: async (req, res) => {
-    let user = await User.findOne({ email: req.body.email });
+    let user = await User.findOne({
+      email: req.body.email,
+    });
 
     if (!user) {
       res.json({
@@ -62,7 +64,8 @@ module.exports = {
         if (user.accountStatus === "disabled") {
           res.json({
             success: false,
-            message: "Authentication failed. Account disabled.",
+            message:
+              "Authentication failed. Account disabled.",
           });
         } else {
           let response = updateToken(user);
@@ -80,18 +83,23 @@ module.exports = {
 
   SignUp: async (req, res) => {
     try {
-      let account = await User.findOne({ email: req.body.email });
+      let account = await User.findOne({
+        email: req.body.email,
+      });
 
       let data = req.body;
       data.password = Encrypt(req.body.password);
       data.accountStatus = "enabled";
       data.imageProfile = "avatar.png";
+      data.state = "false";
       var newUser = new User(data);
 
       await newUser.save();
       return res.status(200).json({ success: true });
     } catch (conflictError) {
-      return res.status(409).json({ error: "Ce compte existe déja" });
+      return res
+        .status(409)
+        .json({ error: "Ce compte existe déja" });
     }
   },
 
@@ -101,7 +109,9 @@ module.exports = {
     if (data.password != "") {
       data.password = Encrypt(data.password);
     }
-    Object.keys(data).forEach((k) => data[k] == "" && delete data[k]);
+    Object.keys(data).forEach(
+      (k) => data[k] == "" && delete data[k]
+    );
     await User.findByIdAndUpdate(req.body.userid, data);
     let user = await User.findById(req.body.userid);
     let response = updateToken(user);
@@ -129,7 +139,12 @@ module.exports = {
     const storage = multer.diskStorage({
       destination: "./public/uploads/",
       filename: function (req, file, cb) {
-        cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+        cb(
+          null,
+          "IMAGE-" +
+            Date.now() +
+            path.extname(file.originalname)
+        );
       },
     });
 
@@ -139,7 +154,10 @@ module.exports = {
     }).single("myImage");
     upload(req, res, async function () {
       let filename = req.file.filename;
-      const result = await User.findByIdAndUpdate(req.query.id, { imageProfile: filename });
+      const result = await User.findByIdAndUpdate(
+        req.query.id,
+        { imageProfile: filename }
+      );
       let user = await User.findById(req.query.id);
       let response = updateToken(user);
       res.status(200).json({
@@ -159,7 +177,12 @@ module.exports = {
     const storage = multer.diskStorage({
       destination: "./public/uploads/",
       filename: function (req, file, cb) {
-        cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+        cb(
+          null,
+          "IMAGE-" +
+            Date.now() +
+            path.extname(file.originalname)
+        );
       },
     });
 
@@ -175,7 +198,11 @@ module.exports = {
     upload(req, res, async function () {
       try {
         let filename = req.file.filename;
-        const result = await LeaveApplication.findByIdAndUpdate(req.query.id, { certificat: filename });
+        const result =
+          await LeaveApplication.findByIdAndUpdate(
+            req.query.id,
+            { certificat: filename }
+          );
         let user = await User.findById(req.query.id);
         let response = updateToken(user);
         res.status(200).json({
@@ -192,7 +219,9 @@ module.exports = {
 
   deleteUser: async (req, res) => {
     try {
-      const result = await User.findOneAndDelete({ _id: req.params.id });
+      const result = await User.findOneAndDelete({
+        _id: req.params.id,
+      });
 
       return res.status(200).send();
     } catch (error) {
@@ -231,7 +260,9 @@ module.exports = {
 
   deleteReqHours: async (req, res) => {
     try {
-      const result = await SuppHours.findOneAndDelete({ _id: req.query.id });
+      const result = await SuppHours.findOneAndDelete({
+        _id: req.query.id,
+      });
       if (result) {
         const userUpdated = await User.updateOne(
           { _id: result.user },
@@ -250,7 +281,10 @@ module.exports = {
   },
 
   updateReqHours: async (req, res) => {
-    await SuppHours.findByIdAndUpdate(req.params.id, req.body);
+    await SuppHours.findByIdAndUpdate(
+      req.params.id,
+      req.body
+    );
 
     res.status(200).json({ success: true });
   },
@@ -272,7 +306,9 @@ module.exports = {
         rapport: newRapp,
       });
       notifAdmin.save();
-      let rapp = await Rapport.find({}).populate("Employee");
+      let rapp = await Rapport.find({}).populate(
+        "Employee"
+      );
 
       res.send(rapp);
     } catch (error) {
@@ -313,17 +349,37 @@ module.exports = {
       let pYear = mDate.getFullYear();
       console.log(leaves);
       const leavesResult = leaves.filter(
-        (a) => ((a.monthF == pMonth && a.yearF == pYear) || (a.monthT == pMonth && a.yearT == pYear)) && a.user == userId && a.status === "Accepted"
+        (a) =>
+          ((a.monthF == pMonth && a.yearF == pYear) ||
+            (a.monthT == pMonth && a.yearT == pYear)) &&
+          a.user == userId &&
+          a.status === "Accepted"
       );
-      const pointageResult = pointages.filter((a) => a.month == pMonth && a.user == userId && a.year == pYear);
-      res.status(200).send({ pointage: pointageResult, leave: leavesResult });
+      const pointageResult = pointages.filter(
+        (a) =>
+          a.month == pMonth &&
+          a.user == userId &&
+          a.year == pYear
+      );
+      res
+        .status(200)
+        .send({
+          pointage: pointageResult,
+          leave: leavesResult,
+        });
     } catch (error) {
       res.send({ error: error });
     }
   },
   GetNotifications: async (req, res) => {
     const user = await User.findById(req.query.id);
-    const notifs = await Notification.find({ user: user, status: "not seen", role: "user" }).populate("promotion").populate("sanction");
+    const notifs = await Notification.find({
+      user: user,
+      status: "not seen",
+      role: "user",
+    })
+      .populate("promotion")
+      .populate("sanction");
     res.status(200).send({ notifs: notifs });
   },
 
@@ -348,7 +404,9 @@ module.exports = {
 
   deleteMutation: async (req, res) => {
     try {
-      const result = await Mutation.findOneAndDelete({ _id: req.query.id });
+      const result = await Mutation.findOneAndDelete({
+        _id: req.query.id,
+      });
       if (result) {
         const userUpdated = await User.updateOne(
           { _id: result.user },
@@ -366,7 +424,10 @@ module.exports = {
   },
   updateMutation: async (req, res) => {
     try {
-      const mutation = await Mutation.findByIdAndUpdate(req.query.id, req.body);
+      const mutation = await Mutation.findByIdAndUpdate(
+        req.query.id,
+        req.body
+      );
       res.status(200).send({ success: "true" });
     } catch (e) {
       res.status(500).send({ success: "false" });
@@ -386,10 +447,16 @@ module.exports = {
       let data = req.body;
       data.status = "terminée";
       data.dateValidation = new Date();
-      let missions = await mission.findByIdAndUpdate(req.query.id, data);
+      let missions = await mission.findByIdAndUpdate(
+        req.query.id,
+        data
+      );
       let m = await mission.findById(req.query.id);
       let user = await User.findById(mission.user);
-      let notif = await Notification.findOneAndUpdate({ mission: missions }, { status: "seen" });
+      let notif = await Notification.findOneAndUpdate(
+        { mission: missions },
+        { status: "seen" }
+      );
       const notifAdmin = new Notification({
         user: user,
         status: "not seen",
@@ -454,7 +521,9 @@ module.exports = {
   },
   markAsSeen: async (req, res) => {
     try {
-      await Notification.findByIdAndUpdate(req.query.id, { status: "seen" });
+      await Notification.findByIdAndUpdate(req.query.id, {
+        status: "seen",
+      });
       res.status(200).send({ success: "true" });
     } catch (e) {
       res.status(500).send({ success: "false" });
