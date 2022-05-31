@@ -12,6 +12,7 @@ module.exports = (app, apiRoutes) => {
   });
   // todoList Routes
   app.route("/Authenticate").post(Uservice.SignIn);
+  app.route("/getPointageByDate").get(adminService.getPointageByDate);
   app.route("/register").post(Uservice.SignUp);
   app
     .route("/userdeleted/:id")

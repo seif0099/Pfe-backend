@@ -619,4 +619,15 @@ module.exports = {
 
     res.status(200).json({ rapport: rapports });
   },
+  getPointageByDate: async(req, res) => {
+    try {
+      let date = new Date(req.query.date)
+      console.log(date)
+      let pointages = await Pointage.find({pDate: date})
+      res.status(200).send({pointages: pointages});
+    }
+    catch(e){
+      res.status(500).send({status: false});
+    }
+  }
 };
