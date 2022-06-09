@@ -41,7 +41,12 @@ var Encrypt = function (string) {
 const storage = multer.diskStorage({
   destination: "./public/uploads/",
   filename: function (req, file, cb) {
-    cb(null, "IMAGE-" + Date.now() + path.extname(file.originalname));
+    cb(
+      null,
+      "IMAGE-" +
+        Date.now() +
+        path.extname(file.originalname)
+    );
   },
 });
 
@@ -61,32 +66,58 @@ module.exports = {
 
       upload(req, res, async function () {
         try {
-          const newLeave = new LeaveApplication(JSON.parse(req.body.data));
+          const newLeave = new LeaveApplication(
+            JSON.parse(req.body.data)
+          );
 
           const user = await User.findById(req.body.userId);
-          let filename = req.file.filename;
-          newLeave.user = user;
-          newLeave.status = "pending";
-          newLeave.certificat = filename;
-          await newLeave.save();
-          user.leaveApplication.push(newLeave);
-          await user.save();
-          const notif = new Notification({
-            user: user,
-            status: "not seen",
-            type: "leave",
-            role: "admin",
-            leaveApplication: newLeave,
-          });
-          notif.save();
+          if (newLeave.reasonForLeave === "maladie") {
+            let filename = req.file.filename;
+            newLeave.user = user;
+            newLeave.status = "pending";
+            newLeave.certificat = filename;
+            await newLeave.save();
+            user.leaveApplication.push(newLeave);
+            await user.save();
+            const notif = new Notification({
+              user: user,
+              status: "not seen",
+              type: "leave",
+              role: "admin",
+              leaveApplication: newLeave,
+            });
+            notif.save();
 
-          let response = updateToken(user);
-          res.status(200).json({
-            success: true,
-            idToken: response.token,
-            expiresIn: 1440,
-            user: response.response,
-          });
+            let response = updateToken(user);
+            res.status(200).json({
+              success: true,
+              idToken: response.token,
+              expiresIn: 1440,
+              user: response.response,
+            });
+          } else {
+            newLeave.user = user;
+            newLeave.status = "pending";
+            await newLeave.save();
+            user.leaveApplication.push(newLeave);
+            await user.save();
+            const notif = new Notification({
+              user: user,
+              status: "not seen",
+              type: "leave",
+              role: "admin",
+              leaveApplication: newLeave,
+            });
+            notif.save();
+
+            let response = updateToken(user);
+            res.status(200).json({
+              success: true,
+              idToken: response.token,
+              expiresIn: 1440,
+              user: response.response,
+            });
+          }
         } catch (err) {
           throw err;
         }
@@ -99,7 +130,10 @@ module.exports = {
 
   deleteLeave: async (req, res) => {
     try {
-      const result = await LeaveApplication.findOneAndDelete({ _id: req.query.id });
+      const result =
+        await LeaveApplication.findOneAndDelete({
+          _id: req.query.id,
+        });
       if (result) {
         const userUpdated = await User.updateOne(
           { _id: result.user },
@@ -118,14 +152,19 @@ module.exports = {
   },
 
   updateLeave: async (req, res) => {
-    result = await LeaveApplication.findByIdAndUpdate(req.query.id, req.body);
+    result = await LeaveApplication.findByIdAndUpdate(
+      req.query.id,
+      req.body
+    );
     console.log(req.body);
     res.status(200).json({ success: true });
   },
   GetRequestById: async (req, res) => {
     console.log(req.query.id);
     const user = await User.findById(req.query.id);
-    const leaves = await LeaveApplication.find({ user: user });
+    const leaves = await LeaveApplication.find({
+      user: user,
+    });
     const result = [];
     leaves.map((row) => {
       let newRow = {};
@@ -144,7 +183,11 @@ module.exports = {
     const client = new SSEClient(res);
     client.initialize();
     setTimeout(() => {
-      client.send({ id: Date.now(), type: "message", data: "hello" });
+      client.send({
+        id: Date.now(),
+        type: "message",
+        data: "hello",
+      });
     }, 5000);
   },
 };

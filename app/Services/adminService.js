@@ -17,6 +17,7 @@ const express = require("express");
 const Notification = require("../models/notif");
 const Demande = require("../models/demande");
 const Rapport = require("../models/rapport");
+const Reponse = require("../models/rep");
 allUsers = function () {
   User.find({}, function (err, users) {
     res.json(users);
@@ -205,6 +206,40 @@ module.exports = {
     }
   },
 
+  createDemande: async (req, res) => {
+    let data = {
+      reponse: req.body.response,
+    };
+    try {
+      const newProm = new Reponse(data);
+      console.log(req.body);
+      const user = await User.findById(req.body.userid);
+      console.log(user);
+      newProm.user = user;
+      await newProm.save();
+      user.Reponse.push(newProm);
+      await user.save();
+      const notif = new Notification({
+        user: user,
+        status: "not seen",
+        type: "Reponse",
+        role: "user",
+        Reponse: newProm,
+      });
+      notif.save();
+      let dems = await Reponse.find({}).populate(
+        "Employee"
+      );
+
+      res
+        .status(200)
+        .json({ message: "Reponse crée avec succés" });
+    } catch (error) {
+      console.log(error);
+      res.send("err");
+    }
+  },
+
   createMission: async (req, res) => {
     try {
       let data = req.body;
@@ -320,7 +355,6 @@ module.exports = {
       const newPointage = new Pointage(req.body);
       console.log(req.body);
       const user = await User.findById(req.body.userid);
-      user.state = "true";
       newPointage.user = user;
       console.log(user, "aaaaaaaaaaa");
       await newPointage.save();
@@ -351,6 +385,8 @@ module.exports = {
       newElement.reasonForLeave = row.reasonForLeave;
       newElement.nom = row.user.nom;
       newElement.prenom = row.user.prenom;
+      newElement.certificat = row.certificat;
+
       result.push(newElement);
     });
     res.status(200).json(result);
@@ -619,15 +655,14 @@ module.exports = {
 
     res.status(200).json({ rapport: rapports });
   },
-  getPointageByDate: async(req, res) => {
+  getPointageByDate: async (req, res) => {
     try {
-      let date = new Date(req.query.date)
-      console.log(date)
-      let pointages = await Pointage.find({pDate: date})
-      res.status(200).send({pointages: pointages});
+      let date = new Date(req.query.date);
+      console.log(date);
+      let pointages = await Pointage.find({ pDate: date });
+      res.status(200).send({ pointages: pointages });
+    } catch (e) {
+      res.status(500).send({ status: false });
     }
-    catch(e){
-      res.status(500).send({status: false});
-    }
-  }
+  },
 };

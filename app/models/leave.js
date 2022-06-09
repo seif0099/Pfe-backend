@@ -3,9 +3,9 @@ var Schema = mongoose.Schema;
 var leaveApplicationSchema = new mongoose.Schema({
   fromDate: { type: Date, required: true },
   toDate: { type: Date, required: true },
-  reasonForLeave: { type: String,  },
-  status: { type: String,  },
-  certificat:{type : String},
+  reasonForLeave: { type: String },
+  status: { type: String },
+  certificat: { type: String },
 
   user: {
     type: Schema.Types.ObjectId,

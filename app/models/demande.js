@@ -9,8 +9,5 @@ var DemandeSchema = new mongoose.Schema({
   },
 });
 
-var Demande = mongoose.model(
-  "Demande",
-  DemandeSchema
-);
+var Demande = mongoose.model("Demande", DemandeSchema);
 module.exports = Demande;

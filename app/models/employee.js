@@ -55,6 +55,10 @@ var employeeSchema = new mongoose.Schema({
   demande: [
     { type: Schema.Types.ObjectId, ref: "Demande" },
   ],
+
+  Response: [
+    { type: Schema.Types.ObjectId, ref: "Reponse" },
+  ],
 });
 var Employee = mongoose.model("Employee", employeeSchema);
 module.exports = Employee;
