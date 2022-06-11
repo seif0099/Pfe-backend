@@ -46,13 +46,14 @@ function updateToken(user) {
 module.exports = {
   SignIn: async (req, res) => {
     let user = await User.findOne({
-      email: req.body.email,
+      matricule: req.body.matricule,
     });
 
     if (!user) {
       res.json({
         success: false,
-        message: "Authentication failed. email not found.",
+        message:
+          "Authentication failed. Matricule not found.",
       });
     } else {
       if (Encrypt(req.body.password) != user.password) {
@@ -361,12 +362,10 @@ module.exports = {
           a.user == userId &&
           a.year == pYear
       );
-      res
-        .status(200)
-        .send({
-          pointage: pointageResult,
-          leave: leavesResult,
-        });
+      res.status(200).send({
+        pointage: pointageResult,
+        leave: leavesResult,
+      });
     } catch (error) {
       res.send({ error: error });
     }

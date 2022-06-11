@@ -51,13 +51,14 @@ function updateToken(user) {
 module.exports = {
   Authenticate: async (req, res) => {
     let user = await admin.findOne({
-      email: req.body.email,
+      matricule: req.body.matricule,
     });
 
     if (!user) {
       res.json({
         success: false,
-        message: "Authentication failed. email not found.",
+        message:
+          "Authentication failed. Matricule not found.",
       });
     } else {
       if (Encrypt(req.body.password) != user.password) {
